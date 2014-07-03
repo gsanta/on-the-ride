@@ -1,0 +1,13 @@
+{
+  "version": "0.1",
+  "name": "On The Ride",
+  "description": "On The Ride",
+  "launch_path": "/index.html",
+  "icons": {
+    "128": "/img/icon.jpg"
+  },
+  "developer": {
+    "name": "Gergely Sánta"
+  },
+  "default_locale": "en"
+}
