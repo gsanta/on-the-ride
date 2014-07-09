@@ -3,10 +3,12 @@ angular.module('starter.controllers', [])
 .controller('DashCtrl', function($scope,$http) {
 
 	(function() {
-		$http.get('/items').success(function(data) {
-			console.log(data)
+		$http.get('/location').success(function(data) {
+			$scope.addLocations(data)
 		});
 	})()
+
+	$scope.map = undefined;
 
 	$scope.loadMap = function() {
 		navigator.geolocation.getCurrentPosition( $scope.initialize );
@@ -20,34 +22,39 @@ angular.module('starter.controllers', [])
 		return "haho"
 	}
 
-	$scope.initialize = function( location ) {
-		console.log( location )
+	$scope.addLocations = function(locations) {
+		var flightPlanCoordinates = [];
 
-		
+		for(var i = 0; i < locations.length; i++) {
+		  	flightPlanCoordinates.push(
+		  		new google.maps.LatLng(locations[i].lat, locations[i].lon)
+		  	)
+		}
 
-		/*var mapProp = {
-			center:new google.maps.LatLng(0, -180),//new google.maps.LatLng( location.coords.latitude, location.coords.longitude ),
-			zoom: 3,
+		var mapProp = {
+			center:new google.maps.LatLng(47.5719851, 1.3142751),//new google.maps.LatLng( location.coords.latitude, location.coords.longitude ),
+			zoom: 12,
 			mapTypeId:google.maps.MapTypeId.ROADMAP
 		};
 
-		var map = new google.maps.Map( document.getElementById( "googleMap" ), mapProp );
+		$scope.map = new google.maps.Map( document.getElementById( "googleMap" ), mapProp );
 
-		 var flightPlanCoordinates = [
-		    new google.maps.LatLng(37.772323, -122.214897),
-		    new google.maps.LatLng(21.291982, -157.821856),
-		    new google.maps.LatLng(-18.142599, 178.431),
-		    new google.maps.LatLng(-27.46758, 153.027892)
-		  ];
-		  var flightPath = new google.maps.Polyline({
+		console.log(flightPlanCoordinates);
+
+		var flightPath = new google.maps.Polyline({
 		    path: flightPlanCoordinates,
 		    geodesic: true,
 		    strokeColor: '#FF0000',
 		    strokeOpacity: 1.0,
 		    strokeWeight: 2
-		  });
+		});
 
-		  flightPath.setMap(map);*/
+		flightPath.setMap($scope.map);
+	}
+
+	$scope.initialize = function( location ) {
+
+		
 	}
 
 })

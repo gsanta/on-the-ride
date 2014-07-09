@@ -27,12 +27,14 @@ mongodb.MongoClient.connect("mongodb://localhost:27017", function (err, mongoCli
     collectionDriver = new CollectionDriver(db);
 });
 
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "jade");
+//app.set( "views", path.join( __dirname, "../www" ) );
+app.set('view engine', 'ejs');
+app.engine('html', require('ejs').renderFile);
 
+// app.set( "view engine", "jade" );
 app.use(express.bodyParser());
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "../www")));
 
 app.post("/:collection", function (req, res) {
     var object = req.body;
@@ -46,18 +48,22 @@ app.post("/:collection", function (req, res) {
     });
 });
 
+app.get("/", function (req, res) {
+    var params = req.params;
+
+    //res.render( "../www/index.html");
+    res.sendfile('../www/index.html');
+});
+
 app.get("/:collection", function (req, res) {
+    console.log("ez lefut");
     var params = req.params;
     collectionDriver.findAll(req.params.collection, function (error, objs) {
         if (error) {
             res.send(400, error);
         } else {
-            if (req.accepts("html")) {
-                res.render("data", { objects: objs, collection: req.params.collection });
-            } else {
-                res.set("Content-Type", "application/json");
-                res.send(200, objs);
-            }
+            res.set("Content-Type", "application/json");
+            res.send(200, objs);
         }
     });
 });
