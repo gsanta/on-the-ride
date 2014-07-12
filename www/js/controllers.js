@@ -3,7 +3,7 @@ angular.module('starter.controllers', [])
 .controller('DashCtrl', function($scope,$http) {
 
 	(function() {
-		$http.get('/location').success(function(data) {
+		$http.get('/location_7').success(function(data) {
 			$scope.addLocations(data)
 		});
 	})()
@@ -23,33 +23,46 @@ angular.module('starter.controllers', [])
 	}
 
 	$scope.addLocations = function(locations) {
-		var flightPlanCoordinates = [];
 
-		for(var i = 0; i < locations.length; i++) {
-		  	flightPlanCoordinates.push(
-		  		new google.maps.LatLng(locations[i].lat, locations[i].lon)
-		  	)
-		}
 
 		var mapProp = {
-			center:new google.maps.LatLng(47.5719851, 1.3142751),//new google.maps.LatLng( location.coords.latitude, location.coords.longitude ),
+			center:new google.maps.LatLng(locations[4].path[0].lat, -1.6676415),//new google.maps.LatLng( location.coords.latitude, location.coords.longitude ),
 			zoom: 12,
 			mapTypeId:google.maps.MapTypeId.ROADMAP
 		};
 
 		$scope.map = new google.maps.Map( document.getElementById( "googleMap" ), mapProp );
 
-		console.log(flightPlanCoordinates);
+		var flightPlanCoordinates = [];
 
-		var flightPath = new google.maps.Polyline({
-		    path: flightPlanCoordinates,
-		    geodesic: true,
-		    strokeColor: '#FF0000',
-		    strokeOpacity: 1.0,
-		    strokeWeight: 2
-		});
+		for(var i = 0; i < locations.length; i++) {
 
-		flightPath.setMap($scope.map);
+			var path = locations[i].path;
+			for(var j = 0; j < path.length; j++) {
+				console.log(path[j].lat + ", " + path[j].lon)
+				flightPlanCoordinates.push(
+		  			new google.maps.LatLng(path[j].lat, path[j].lon)
+		  		)
+			}
+
+			var flightPath = new google.maps.Polyline({
+			    path: flightPlanCoordinates,
+			    geodesic: true,
+			    strokeColor: '#FF0000',
+			    strokeOpacity: 1.0,
+			    strokeWeight: 2
+			});
+
+			flightPath.setMap($scope.map);
+			flightPlanCoordinates = []
+		}
+
+		// for(var i = 0; i < locations.length; i++) {
+		  	// flightPlanCoordinates.push(
+		  		// new google.maps.LatLng(locations[i].lat, locations[i].lon)
+		  	// )
+		// }
+		
 	}
 
 	$scope.initialize = function( location ) {
