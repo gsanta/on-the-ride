@@ -14,6 +14,12 @@ angular.module('starter.controllers', [])
 		});
 	})()
 
+	$scope.jasminTest = "Test";
+	  
+	$scope.jasminTestFunc = function() {
+	    $scope.jasminTestGreeting = "Hello " + $scope.jasminTest;
+	}
+
 	$scope.map = undefined;
 
 	$scope.loadMap = function() {

@@ -6,6 +6,7 @@ var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
+var jasmine = require('gulp-jasmine');
 
 var paths = {
   sass: ['./scss/**/*.scss']
@@ -27,6 +28,7 @@ gulp.task('sass', function(done) {
 
 gulp.task('watch', function() {
   gulp.watch(paths.sass, ['sass']);
+  gulp.watch(['www/js/*.js', 'spec/*.js'], ['jasmine'])
 });
 
 gulp.task('install', ['git-check'], function() {
@@ -48,3 +50,8 @@ gulp.task('git-check', function(done) {
   }
   done();
 });
+
+gulp.task('jasmine', function() {
+  gulp.src('spec/*Spec.js')
+  .pipe(jasmine());
+})
