@@ -1,1 +1,9 @@
 /* Empty. Add your own CSS if you like */
+
+.error {
+	border: 1px solid red;
+}
+
+.success {
+	border: 1px solid green;
+}

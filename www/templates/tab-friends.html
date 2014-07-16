@@ -1,9 +1,26 @@
-<ion-view title="Friends">
-  <ion-content class="has-header">
-    <ion-list>
-      <ion-item ng-repeat="friend in friends" type="item-text-wrap" href="#/tab/friend/{{friend.id}}">
-        {{friend.name}}
-      </ion-item>
-    </ion-list>
-  </ion-content>
-</ion-view>
+<form name="infoForm" novalidate>
+<div class="list" >
+  	<label class="item item-input item-select">
+    	<div class="input-label">
+      		Category
+    	</div>
+    	<select ng-model="category" ng-options="category.name for category in categories" required>
+    		<option value="">-- Select a Category --</option>
+    	</select>
+  	</label>
+  	<label class="item item-input" ng-class="getCssClasses(infoForm.description)">
+  		<textarea name="description" ng-model="description" placeholder="Write your thoughts" required></textarea>
+  	</label>
+  	<label class="item item-input" ng-class="getCssClasses(infoForm.latitude)">
+  		<input name="latitude" ng-model="latitude" placeholder="Latitude" required/>
+  	</label>
+  	<label class="item item-input" ng-class="getCssClasses(infoForm.longitude)">
+  		<input name="longitude" ng-model="longitude" placeholder="Longitude" required/>
+  	</label>
+  	<button ng-click="save()" ng-disabled="!canSave()" class="button button-block button-dark">
+		Save
+	</button>
+</div>
+</form>
+
+{{canSave()}}

@@ -10,9 +10,38 @@ angular.module('starter.controllers', [])
 				$scope.addLocations(data[i].nodes)
 			}
 			
-			
+			$scope.fetchInfo();
 		});
 	})()
+
+	$scope.fetchInfo = function() {
+		$http.get('/info').success(function(data) {
+			console.log(data)
+
+			for(var i = 0; i < data.length; i++) {
+				console.log("fetchinfo lefut")
+				$scope.addInfo(data[i])
+			}			
+		});
+	}
+
+	$scope.addInfo = function(data) {
+		var marker = new google.maps.Marker({
+		    position: new google.maps.LatLng(data.lat,data.lon),
+		    map: $scope.map,
+		    title:"Hello World!"
+		});
+
+		var contentString = data.desc;
+
+		var infowindow = new google.maps.InfoWindow({
+		    content: contentString
+		});
+
+		google.maps.event.addListener(marker, 'click', function() {
+			infowindow.open($scope.map,marker);
+		});
+	}
 
 	$scope.jasminTest = "Test";
 	  
@@ -65,35 +94,6 @@ angular.module('starter.controllers', [])
 		});
 
 		flightPath.setMap($scope.map);
-
-		// for(var i = 0; i < locations.length; i++) {
-
-		// 	var path = locations[i].path;
-		// 	for(var j = 0; j < path.length; j++) {
-		// 		console.log(path[j].lat + ", " + path[j].lon)
-		// 		flightPlanCoordinates.push(
-		//   			new google.maps.LatLng(path[j].lat, path[j].lon)
-		//   		)
-		// 	}
-
-		// 	var flightPath = new google.maps.Polyline({
-		// 	    path: flightPlanCoordinates,
-		// 	    geodesic: true,
-		// 	    strokeColor: '#FF0000',
-		// 	    strokeOpacity: 1.0,
-		// 	    strokeWeight: 2
-		// 	});
-
-		// 	flightPath.setMap($scope.map);
-		// 	flightPlanCoordinates = []
-		// }
-
-		// for(var i = 0; i < locations.length; i++) {
-		  	// flightPlanCoordinates.push(
-		  		// new google.maps.LatLng(locations[i].lat, locations[i].lon)
-		  	// )
-		// }
-		
 	}
 
 	$scope.initialize = function( location ) {
@@ -103,8 +103,51 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('FriendsCtrl', function($scope, Friends) {
-  $scope.friends = Friends.all();
+.controller('FriendsCtrl', function($scope, $http) {
+  	$scope.categories = [
+  		{name: "Accomodation"},
+  		{name: "Shop"},
+  		{name: "Sight"}
+  	];
+
+  	$scope.category = "";
+  	$scope.description = "";
+  	$scope.latitude = "";
+  	$scope.longitude = "";
+
+  	 $scope.getCssClasses = function(ngModelContoller) {
+	    return {
+	    	error: ngModelContoller.$invalid && ngModelContoller.$dirty,
+	    	success: ngModelContoller.$valid && ngModelContoller.$dirty
+	    };
+	};
+
+  	$scope.showError = function(ngModelController, error) {
+		return ngModelController.$error[error];
+	};
+
+	$scope.canSave = function() {
+		return $scope.infoForm.$dirty && $scope.infoForm.$valid;
+	};
+
+	$scope.save = function() {
+		var data = {
+			category: $scope.category.name,
+			desc: $scope.description,
+			lat: $scope.latitude,
+			lon: $scope.longitude
+		}
+
+		console.log(data)
+
+		$http.post('/info', data)
+		.success(function() {
+			alert("success")
+		})
+		.error(function() {
+			alert("error")
+		})
+	}
 })
 
 .controller('FriendDetailCtrl', function($scope, $stateParams, Friends) {
