@@ -2,26 +2,26 @@ angular.module('starter.controllers', [])
 
 .controller('DashCtrl', function($scope,$http) {
 
-	(function() {
-		$http.get('/eurovelo_6').success(function(data) {
-			console.log(data)
+	// (function() {
+	// 	$http.get('/eurovelo_6').success(function(data) {
+	// 		console.log(data)
 
-			for(var i = 0; i < data.length; i++) {
-				$scope.addLocations(data[i].nodes)
-			}
+	// 		for(var i = 0; i < data.length; i++) {
+	// 			$scope.addLocations(data[i].nodes)
+	// 		}
 			
-			$scope.fetchInfo();
-		});
-	})()
+	// 		$scope.fetchInfo();
+	// 	});
+	// })()
+
+	$scope.infoBoxes = []
 
 	$scope.fetchInfo = function() {
 		$http.get('/info').success(function(data) {
-			console.log(data)
-
-			for(var i = 0; i < data.length; i++) {
-				console.log("fetchinfo lefut")
-				$scope.addInfo(data[i])
-			}			
+			$scope.infoBoxes = data;
+			// for(var i = 0; i < data.length; i++) {
+			// 	$scope.addInfo(data[i])
+			// }			
 		});
 	}
 
