@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
+angular.module('starter', ['ionic', 'controllers', 'starter.services'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -42,8 +42,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       url: '/dash',
       views: {
         'tab-dash': {
-          templateUrl: 'templates/tab-dash.html',
-          controller: 'DashCtrl'
+          templateUrl: 'templates/map.html',
+          controller: 'MapCtrl'
         }
       }
     })
@@ -52,8 +52,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       url: '/friends',
       views: {
         'tab-friends': {
-          templateUrl: 'templates/tab-friends.html',
-          controller: 'FriendsCtrl'
+          templateUrl: 'templates/place_info_form.html',
+          controller: 'PlaceInfoCtrl'
         }
       }
     })
@@ -81,4 +81,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
   $urlRouterProvider.otherwise('/tab/dash');
 
 });
+
+angular.module( "controllers", [] )
+
+angular.module( "services", [] )
 
