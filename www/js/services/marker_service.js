@@ -1,30 +1,37 @@
-angular.module( "services" )
-.factory( "Marker", function() {
+define(['angular'], function (angular) {
+	'use strict';
 
-	var factoryObj = {};
+	var factory = function() {
 
-	factoryObj.createMarker = function(position, title, map) {
+		var factoryObj = {};
 
-		var marker = new google.maps.Marker({
-		    position: position,//new google.maps.LatLng(data.lat,data.lon),
-		    map: map,
-		    title: title
-		});
+		factoryObj.createMarker = function(position, title, map) {
 
-		return marker;
-	}
-
-	factoryObj.createInfoWindow = function(text, map, marker) {
-		var infowindow = new google.maps.InfoWindow({
-		    content: text
-		});
-
-		if(map && marker) {
-			google.maps.event.addListener(marker, 'click', function() {
-				infowindow.open($scope.map,marker);
+			var marker = new google.maps.Marker({
+			    position: position,//new google.maps.LatLng(data.lat,data.lon),
+			    map: map,
+			    title: title
 			});
-		}
-	}
 
-	return factoryObj;
-})
+			return marker;
+		}
+
+		factoryObj.createInfoWindow = function(text, map, marker) {
+			var infowindow = new google.maps.InfoWindow({
+			    content: text
+			});
+
+			if(map && marker) {
+				google.maps.event.addListener(marker, 'click', function() {
+					infowindow.open($scope.map,marker);
+				});
+			}
+		}
+
+		return factoryObj;
+	};
+
+	factory.$inject = [];
+    return factory;
+});
+

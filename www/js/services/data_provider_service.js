@@ -1,38 +1,45 @@
-angular.module( "services" )
-.factory( "DataProvider", function($http) {
+define(['angular'], function (angular) {
+	'use strict';
 
-	var factoryObj = {};
+	var factory = function($http) {
 
-	factoryObj.loadPlaceInfo = function() {
+		var factoryObj = {};
 
-		return $http.get('/info');
+		factoryObj.loadPlaceInfo = function() {
 
-		// $http.get('/info').success(function(data) {
-		// 	$scope.infoBoxes = data;
-		// 	// for(var i = 0; i < data.length; i++) {
-		// 	// 	$scope.addInfo(data[i])
-		// 	// }			
-		// });
-	}
+			return $http.get('/info');
 
-	factoryObj.loadRouteInfo = function() {
-		return $http.get('/eurovelo_6');
-	}
+			// $http.get('/info').success(function(data) {
+			// 	$scope.infoBoxes = data;
+			// 	// for(var i = 0; i < data.length; i++) {
+			// 	// 	$scope.addInfo(data[i])
+			// 	// }			
+			// });
+		}
 
-	factoryObj.savePlaceInfo = function( data ) {
-		return $http.post('/info', data);
-	}
+		factoryObj.loadRouteInfo = function() {
+			return $http.get('/eurovelo_6');
+		}
 
-	// (function() {
-	// 	$http.get('/eurovelo_6').success(function(data) {
-	// 		console.log(data)
+		factoryObj.savePlaceInfo = function( data ) {
+			return $http.post('/info', data);
+		}
 
-	// 		for(var i = 0; i < data.length; i++) {
-	// 			$scope.addLocations(data[i].nodes)
-	// 		}
-			
-	// 		$scope.fetchInfo();
-	// 	});
-	// })()
-	return factoryObj;
+		// (function() {
+		// 	$http.get('/eurovelo_6').success(function(data) {
+		// 		console.log(data)
+
+		// 		for(var i = 0; i < data.length; i++) {
+		// 			$scope.addLocations(data[i].nodes)
+		// 		}
+				
+		// 		$scope.fetchInfo();
+		// 	});
+		// })()
+		return factoryObj;
+	};
+
+
+	factory.$inject = ['$http'];
+    return factory;
 })

@@ -1,31 +1,7 @@
-define(['angular'], function (angular) {
+define(function () {
+    'use strict';
 
-	return angular.module( "controllers", [ "services" ] )
-	.controller('MapCtrl', function( $scope,$http, Map, DataProvider ) {
-
-		$scope.routeInfo = undefined;
-		$scope.map = undefined;
-
-		$scope.initMap = function() {
-			var routeInfoPromise = DataProvider.loadRouteInfo();
-
-			routeInfoPromise.success( function( data ) {
-				$scope.routeInfo = data;
-
-				var centerCoordinates = Map.createCoordinate( data[0].nodes[0].lat, data[0].nodes[0].lon );
-
-				$scope.map = Map.createMap( centerCoordinates, 12, document.getElementById( "googleMap" ) );
-
-				for(var i = 0; i < data.length; i++) {
-					Map.addRoute( data[i].nodes, $scope.map )
-				}
-			})
-		}
-
-		$scope.infoBoxes = []
-	})
-
-	.controller( "PlaceInfoCtrl" , function( $scope, $http, DataProvider ) {
+	var ctrl = function( $scope, $http, DataProvider ) {
 	  	$scope.categories = [
 	  		{name: "Accomodation"},
 	  		{name: "Shop"},
@@ -68,14 +44,8 @@ define(['angular'], function (angular) {
 				alert("failure saving info data")
 			} )
 		}
-	})
+	};
 
-	.controller('FriendDetailCtrl', function($scope, $stateParams, Friends) {
-	  $scope.friend = Friends.get($stateParams.friendId);
-	})
-
-	.controller('AccountCtrl', function($scope) {
-	});
-
+	ctrl.$inject = ['$scope', '$http', 'DataProviderService'];
+    return ctrl;
 });
-
