@@ -10,7 +10,7 @@ describe('Unit: DashController', function() {
 
 	    	ctrl = $controller('DashCtrl', {
 	      		$scope: scope
-	    	});
+	    	}); 
 	  	}));
 
 	  	it('should create $scope.jasminTestGreeting when calling jasminTestFunc', function() {
