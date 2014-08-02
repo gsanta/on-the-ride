@@ -1,8 +1,4 @@
 node_modules/
 coverage/
 platforms/
-plugins/
 www/lib/
-www/controllers/**/*.js
-www/services/**/*.js
-
