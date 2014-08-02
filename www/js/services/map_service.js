@@ -1,52 +1,45 @@
-define(['angular'], function (angular) {
-	'use strict';
+angular.module( "services" )
+.factory( "Map", function() {
 
-	var factory = function() {
+	var factoryObj = {};
 
-		var factoryObj = {};
+	factoryObj.createMap = function( centerPosition, zoom, domElement ,mapTypeId ) {
+		var mapProp = {
+			center: centerPosition,
+			zoom: zoom,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		};
 
-		factoryObj.createMap = function( centerPosition, zoom, domElement ,mapTypeId ) {
-			var mapProp = {
-				center: centerPosition,
-				zoom: zoom,
-				mapTypeId: google.maps.MapTypeId.ROADMAP
-			};
-
-			if( mapTypeId != undefined ) {
-				mapProp.mapTypeId = mapTypeId;
-			}
-
-			return new google.maps.Map( domElement, mapProp );
+		if( mapTypeId != undefined ) {
+			mapProp.mapTypeId = mapTypeId;
 		}
 
-		factoryObj.addRoute = function( route, map ) {
-			var coordinates = [];
+		return new google.maps.Map( domElement, mapProp );
+	}
 
-			for( var i = 0; i < route.length; i++ ) {
-			  	coordinates.push(
-			  		new google.maps.LatLng( route[i].lat, route[i].lon )
-			  	)
-			}
+	factoryObj.addRoute = function( route, map ) {
+		var coordinates = [];
 
-			var routePolyline = new google.maps.Polyline({
-			    path: coordinates,
-			    geodesic: true,
-			    strokeColor: '#FF0000',
-			    strokeOpacity: 1.0,
-			    strokeWeight: 2
-			});
-
-			routePolyline.setMap( map );
+		for( var i = 0; i < route.length; i++ ) {
+		  	coordinates.push(
+		  		new google.maps.LatLng( route[i].lat, route[i].lon )
+		  	)
 		}
 
-		factoryObj.createCoordinate = function( lat, lon ) {
-			return new google.maps.LatLng( lat,lon )
-		}
+		var routePolyline = new google.maps.Polyline({
+		    path: coordinates,
+		    geodesic: true,
+		    strokeColor: '#FF0000',
+		    strokeOpacity: 1.0,
+		    strokeWeight: 2
+		});
 
-		return factoryObj;
-	};
+		routePolyline.setMap( map );
+	}
 
-	factory.$inject = [];
-    return factory;
+	factoryObj.createCoordinate = function( lat, lon ) {
+		return new google.maps.LatLng( lat,lon )
+	}
 
+	return factoryObj;
 })
