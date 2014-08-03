@@ -5,7 +5,10 @@ module.exports = function(config){
     files: [
       'www/lib/ionic/js/ionic.bundle.js',
       'www/lib/ionic/js/angular/angular-mocks.js',
-      'www/js/*.js',
+      'www/js/controllers/index.js',
+      'www/js/services/index.js',
+      'www/js/services/DataProviderService.js',
+      'www/js/**/*.js',
       /*'tests/helper.js',*/
       'tests/spec/**/*.spec.js'
     ],
@@ -25,7 +28,7 @@ module.exports = function(config){
             'karma-junit-reporter',
             'karma-chrome-launcher',
             'karma-firefox-launcher',
-            'karma-phantomjs-launcherr'
+            'karma-phantomjs-launcher',
             'karma-script-launcher',
             'karma-jasmine'
             ],
