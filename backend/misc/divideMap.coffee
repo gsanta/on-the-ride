@@ -11,8 +11,8 @@ divideMap = ( vertical, horizontal ) ->
 	lonIncr = lonDiff / horizontal
 
 	results = []
-	for i in [ 0..( vertical - 1 ) ]
-		for j in [ 0..( horizontal - 1 ) ]
+	for i in [ 0...vertical ]
+		for j in [ 0...horizontal ]
 			results.push {
 				lat: latStart - i * latIncr,
 				lon: lonStart + j * lonIncr,
