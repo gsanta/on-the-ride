@@ -1,9 +1,0 @@
-{
-  "name": "miscallenous_things",
-  "version": "0.0.1",
-  "private": true,
-  "dependencies": {
-    "xml2js": "*",
-    "request": "*"
-  }
-}

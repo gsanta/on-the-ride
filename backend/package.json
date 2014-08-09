@@ -9,6 +9,8 @@
     "xml2js": "~0.4.4",
     "request": "~2.39.0",
     "async": "~0.9.0",
-    "node-uuid": "~1.4.1"
+    "node-uuid": "~1.4.1",
+    "q": "~1.0.1",
+    "request-promise": "0.0.4"
   }
 }
