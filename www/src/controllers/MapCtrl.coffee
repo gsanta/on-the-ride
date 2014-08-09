@@ -1,5 +1,5 @@
 angular.module "controllers"
-.controller 'MapCtrl', ( $scope,$http, Map, DataProvider ) ->
+.controller 'MapCtrl', ( $scope, $http, Map, DataProvider ) ->
 
 	$scope.routeInfo = undefined;
 	$scope.map = undefined;
