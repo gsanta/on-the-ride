@@ -9,17 +9,17 @@ nodeUrl = "http://api.openstreetmap.org/api/0.6/node/"
 openStreetMapParser.loadFileFromUrl relationUrl
 .then openStreetMapParser.parseXmlToJs
 	, ( err ) -> 
-		console.log "failure"
+		console.log "failure loading relation"
 .then ( data ) ->
 		wayRefs = openStreetMapParser.extractWayRefsFromRelation data
 
 		wayPromises = []
-		#for way in wayRefs
-		promise = openStreetMapParser.loadFileFromUrl wayUrl + wayRefs[0].ref
-		wayPromises.push promise.then openStreetMapParser.parseXmlToJs
+		for way in wayRefs
+			promise = openStreetMapParser.loadFileFromUrl wayUrl + way.ref
+			wayPromises.push promise.then openStreetMapParser.parseXmlToJs
 		Q.all wayPromises
 	, ( err ) ->
-		console.log "failure again"
+		console.log "failure parsing relation"
 .then ( data ) ->
 		nodeRefs = []
 		for way in data
@@ -31,7 +31,7 @@ openStreetMapParser.loadFileFromUrl relationUrl
 			nodePromises.push promise.then openStreetMapParser.parseXmlToJs
 		Q.all nodePromises
 	, ( err ) -> 
-		console.log "3rd failure"
+		console.log "failure loading/parsing way"
 .then ( data ) ->
 		coords = []
 		for node in data
@@ -43,4 +43,4 @@ openStreetMapParser.loadFileFromUrl relationUrl
 			else
 				console.log "The file was saved!"
 	, ( err ) -> 
-		console.log "4th failure"
+		console.log "failure loading/parsing node"
