@@ -23,17 +23,25 @@ divideMap = ( latS, latE, lonS, lonE ) ->
 
 
 maxIter = 3
+indexer = 0
 
 createMapHieararchy = ( iter, latS, latE, lonS, lonE ) ->
+	indexer++;
 	if iter == maxIter
 		area = 
-			lat: latS,
-			lon: lonS,
+			latS: latS,
+			lonS: lonS,
+			latE: latE,
+			lonE: lonE,
+			index: indexer
 			children: []
 		return area
 	area = 
-		lat: latS,
-		lon: lonS,
+		latS: latS,
+		lonS: lonS,
+		latE: latE,
+		lonE: lonE,
+		index: indexer
 		children: []
 	dividedMap = divideMap latS, latE, lonS, lonE
 	iter++
@@ -47,6 +55,26 @@ createMapHieararchy = ( iter, latS, latE, lonS, lonE ) ->
 		area.children.push newArea
 	return area
 
+startDfs = ( node ) ->
+	arrayTree = []
+
+	visitDfs = ( node ) ->
+		area = 
+			latS: node.latS,
+			lonS: node.lonS,
+			latE: node.latE,
+			lonE: node.lonE,
+			index: node.index
+		
+		arrayTree.push area
+
+		console.log node.index
+		for child in node.children
+			visitDfs child
+
+	visitDfs node
+	return arrayTree
+
 area = createMapHieararchy 1, latStart, latEnd, lonStart, lonEnd
 
 jsonString = JSON.stringify( area, null, 4 )
@@ -56,5 +84,14 @@ fs.writeFile "map.json", jsonString, ( err ) ->
 	else
 		console.log "The file was saved!"
 
-console.log area 
+resultTree = startDfs area
+console.log "length: #{resultTree.length}"
+
+jsonString = JSON.stringify( resultTree, null, 4 )
+fs.writeFile "arrayTree.json", jsonString, ( err ) ->
+	if err 
+		console.log err
+	else
+		console.log "The file was saved!"
+
 
