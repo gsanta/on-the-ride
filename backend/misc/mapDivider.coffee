@@ -55,25 +55,36 @@ createMapHieararchy = ( iter, latS, latE, lonS, lonE ) ->
 		area.children.push newArea
 	return area
 
-startDfs = ( node ) ->
+createArrayWithBsf = ( node ) ->
+	queue = [node]
 	arrayTree = []
+	indexer = 0
 
-	visitDfs = ( node ) ->
+	while queue.length > 0
+		actNode = queue.shift()
+
 		area = 
-			latS: node.latS,
-			lonS: node.lonS,
-			latE: node.latE,
-			lonE: node.lonE,
-			index: node.index
-		
+			latS: actNode.latS,
+			lonS: actNode.lonS,
+			latE: actNode.latE,
+			lonE: actNode.lonE,
+			areaId: indexer
+
 		arrayTree.push area
+		indexer += 1;
 
-		console.log node.index
-		for child in node.children
-			visitDfs child
+		for child in actNode.children
+			queue.push child
 
-	visitDfs node
-	return arrayTree
+	return arrayTree;
+
+countChildIndexesForNodesInBsfArray = ( bsfArray ) ->
+	for element, index in bsfArray
+		element.childAreaIds = []
+		element.childAreaIds.push ( index * 4 + 1 ) 
+		element.childAreaIds.push ( index * 4 + 2 )
+		element.childAreaIds.push ( index * 4 + 3 )
+		element.childAreaIds.push ( index * 4 + 4 )
 
 area = createMapHieararchy 1, latStart, latEnd, lonStart, lonEnd
 
@@ -84,7 +95,8 @@ fs.writeFile "map.json", jsonString, ( err ) ->
 	else
 		console.log "The file was saved!"
 
-resultTree = startDfs area
+resultTree = createArrayWithBsf area
+countChildIndexesForNodesInBsfArray resultTree
 console.log "length: #{resultTree.length}"
 
 jsonString = JSON.stringify( resultTree, null, 4 )
