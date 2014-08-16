@@ -1,6 +1,9 @@
-
 openStreetMapParser = require( './openStreetMapParser' )
 fs = require 'fs'
+
+if not process.argv[2]?
+	console.log "command line argument for map depth is missing"
+	process.exit 1
 
 latStart = 70; lonStart = -10
 latEnd = 30; lonEnd = 55
@@ -21,8 +24,8 @@ divideMap = ( latS, latE, lonS, lonE ) ->
 	results
 
 
-
-maxIter = 3
+console.log "arg: " + process.argv[2]
+maxIter = parseInt process.argv[2]
 indexer = 0
 
 createMapHieararchy = ( iter, latS, latE, lonS, lonE ) ->
@@ -68,7 +71,7 @@ createArrayWithBsf = ( node ) ->
 			lonS: actNode.lonS,
 			latE: actNode.latE,
 			lonE: actNode.lonE,
-			areaId: indexer
+			_id: indexer
 
 		arrayTree.push area
 		indexer += 1;
@@ -81,10 +84,9 @@ createArrayWithBsf = ( node ) ->
 countChildIndexesForNodesInBsfArray = ( bsfArray ) ->
 	for element, index in bsfArray
 		element.childAreaIds = []
-		element.childAreaIds.push ( index * 4 + 1 ) 
-		element.childAreaIds.push ( index * 4 + 2 )
-		element.childAreaIds.push ( index * 4 + 3 )
-		element.childAreaIds.push ( index * 4 + 4 )
+		for i in [ 1..4 ]
+			if index * 4 + 1 < bsfArray.length
+				element.childAreaIds.push ( index * 4 + i ) 
 
 area = createMapHieararchy 1, latStart, latEnd, lonStart, lonEnd
 

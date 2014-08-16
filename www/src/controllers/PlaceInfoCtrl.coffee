@@ -1,23 +1,23 @@
 angular.module "controllers"
 .controller "PlaceInfoCtrl" , ( $scope, $http, DataProvider ) ->
-  	$scope.categories = [
-  		{ name: "Accomodation" },
-  		{ name: "Shop" },
-  		{ name: "Sight" }
-  	];
+	$scope.categories = [
+		{ name: "Accomodation" },
+		{ name: "Shop" },
+		{ name: "Sight" }
+	];
 
-  	$scope.category = ""
-  	$scope.description = ""
-  	$scope.latitude = ""
-  	$scope.longitude = ""
+	$scope.category = ""
+	$scope.description = ""
+	$scope.latitude = ""
+	$scope.longitude = ""
 
-  	$scope.getCssClasses = ( ngModelContoller ) ->
+	$scope.getCssClasses = ( ngModelContoller ) ->
 	    return {
 	    	error: ngModelContoller.$invalid && ngModelContoller.$dirty,
 	    	success: ngModelContoller.$valid && ngModelContoller.$dirty
 	    }
 
-  	$scope.showError = ( ngModelController, error ) ->
+	$scope.showError = ( ngModelController, error ) ->
 		return ngModelController.$error[error];
 
 	$scope.canSave = ->

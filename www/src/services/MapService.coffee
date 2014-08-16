@@ -1,5 +1,5 @@
 angular.module "services"
-.factory "Map", ->
+.factory "Map", ( DataProvider ) ->
 
 	factoryObj =
 
@@ -14,22 +14,48 @@ angular.module "services"
 			new google.maps.Map( domElement, mapProp );
 	
 
-		addRoute: ( route, map ) ->
-			coordinates = [];
+		createRootFromNodeArray: ( nodeArray, startNode, map ) ->
+			route = [ ];
 
-			coordinates.push new google.maps.LatLng coordinate.lat, coordinate.lon for coordinate in route
+			nodeAssocMap = {}
+			for node in nodeArray
+				nodeAssocMap[ node._id ] = node
 
-			routePolyline = new google.maps.Polyline {
-			    path: coordinates,
-			    geodesic: true,
-			    strokeColor: '#FF0000',
-			    strokeOpacity: 1.0,
-			    strokeWeight: 2
-			}
+			actNode = startNode
+			while actNode != undefined
+				route.push actNode
+				actNode = nodeAssocMap[ actNode.siblings[0] ] 
 
-			routePolyline.setMap( map );
+			coordinates = []
+			coordinates.push new google.maps.LatLng node.lat, node.lon for node in route
+
+			# routePolyline = new google.maps.Polyline {
+			#     path: coordinates,
+			#     geodesic: true,
+			#     strokeColor: '#FF0000',
+			#     strokeOpacity: 1.0,
+			#     strokeWeight: 2
+			# }
+
+			# routePolyline.setMap( map );
+
+			for coordinate in coordinates 
+				populationOptions = 
+					strokeColor: '#FF0000',
+					strokeOpacity: 0.8,
+					strokeWeight: 1,
+					fillColor: '#FF0000',
+					fillOpacity: 0.35,
+					map: map,
+					center: coordinate,
+					radius: 1
+
+				cityCircle = new google.maps.Circle populationOptions
+				cityCircle.setMap map
 
 		createCoordinate: ( lat, lon ) ->
 			new google.maps.LatLng lat,lon
+
+		findMapAreaForCoordinate: ( lat, lon ) ->
 		
 	factoryObj;

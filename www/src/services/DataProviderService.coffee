@@ -1,5 +1,5 @@
 angular.module 'services'
-.factory 'DataProvider', ($http) ->
+.factory 'DataProvider', ( $http ) ->
 	
 	factoryObj = 
 	
@@ -8,9 +8,9 @@ angular.module 'services'
 
 
 		loadRouteInfo: ->
-			$http.get('/eurovelo_6');
+			$http.get('/eurovelo_6_new');
 
-		savePlaceInfo: (data) ->
+		savePlaceInfo: ( data ) ->
 			$http.post('/info', data);
 
 	factoryObj

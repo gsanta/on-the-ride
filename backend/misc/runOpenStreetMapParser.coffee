@@ -33,14 +33,19 @@ openStreetMapParser.loadFileFromUrl relationUrl
 	, ( err ) -> 
 		console.log "failure loading/parsing way"
 .then ( data ) ->
+		writeFile "nodes.json", jsonString
 		coords = []
 		for node in data
 			coords.push openStreetMapParser.extractCoordsFromNode node
 		jsonString = JSON.stringify( coords, null, 4 )
-		fs.writeFile "test.json", jsonString, ( err ) ->
-			if err 
-				console.log err
-			else
-				console.log "The file was saved!"
+		writeFile "test.json", jsonString
 	, ( err ) -> 
 		console.log "failure loading/parsing node"
+
+
+writeFile = ( fileName, json ) ->
+	fs.writeFile fileName, json, ( err ) ->
+		if err 
+			console.log err
+		else
+			console.log "The file was saved!"
