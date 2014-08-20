@@ -2,6 +2,7 @@ ObjectID = require( "mongodb" ).ObjectID;
 
 CollectionDriver = ( db ) ->
         this.db = db
+        return
 
 CollectionDriver.prototype.getCollection = ( collectionName, callback ) ->
     this.db.collection collectionName, ( error, the_collection ) ->
@@ -26,15 +27,11 @@ CollectionDriver.prototype.get = ( collectionName, id, callback ) ->
         if error
             callback error
         else
-            checkForHexRegExp = new RegExp "^[0-9a-fA-F]{24}$"
-            if !( checkForHexRegExp.test id )
-                callback { error: "invalid id", name: "", message: "" }
-            else
-                the_collection.findOne { '_id': ObjectID id  }, ( err, doc ) ->
-                    if error
-                        callback error
-                    else
-                        callback null, doc
+            the_collection.findOne { '_id': id  }, ( err, doc ) ->
+                if error
+                    console.log error
+                else
+                    callback null, doc
 
 CollectionDriver.prototype.save = ( collectionName, obj, callback ) ->
     this.getCollection collectionName, ( error, the_collection ) ->
@@ -69,4 +66,4 @@ CollectionDriver.prototype.delete = ( collectionName, entityId, callback ) ->
                 else
                     callback null, doc
 
-exports.CollectionDriver = CollectionDriver;
+module.exports.CollectionDriver = CollectionDriver;
