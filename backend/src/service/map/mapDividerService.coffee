@@ -1,4 +1,3 @@
-openStreetMapParser = require( './openStreetMapParser' )
 fs = require 'fs'
 
 if not process.argv[2]?
@@ -53,7 +52,7 @@ createMapHieararchy = ( iter, latS, latE, lonS, lonE ) ->
 	lonDiff = ( Math.abs lonS - lonE ) / 2
 
 	for i in [0...dividedMap.length]
-		newArea = ( createMapHieararchy iter, dividedMap[i].lat, dividedMap[i].lat + latDiff,
+		newArea = ( createMapHieararchy iter, dividedMap[i].lat, dividedMap[i].lat - latDiff,
 			 dividedMap[i].lon, dividedMap[i].lon + lonDiff )
 		area.children.push newArea
 	return area

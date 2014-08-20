@@ -3,7 +3,8 @@ http = require "http"
 express = require "express"
 path = require "path"
 mongodb = require "mongodb"
-mongodbHelper = require "./collectionDriver"
+mongodbHelper = require "./js/service/db/collectionDriverService"
+util = require('util');
 
 MongoClient = mongodb.MongoClient;
 Server = mongodb.Server;
@@ -22,7 +23,8 @@ mongodb.MongoClient.connect "mongodb://localhost:27017", ( err, mongoClient ) ->
         process.exit(1);
 
     db = mongoClient.db "on_the_ride"
-    collectionDriver = new CollectionDriver db
+    collectionDriver = new mongodbHelper.CollectionDriver( db )
+    return
 
 app.set 'view engine', 'ejs'
 app.engine 'html', require( 'ejs' ).renderFile
@@ -44,6 +46,7 @@ app.get "/", ( req, res ) ->
     res.sendfile '../www/index.html'
 
 app.get "/:collection", ( req, res ) ->
+    console.log "collection hivodeik meg"
     params = req.params;
     collectionDriver.findAll req.params.collection, ( error, objs ) ->
         if error
@@ -53,8 +56,10 @@ app.get "/:collection", ( req, res ) ->
             res.send 200, objs
 
 app.get "/:collection/:entity", ( req, res ) ->
+    console.log "ez hivodik meg"
     params = req.params
     entity = params.entity
+    console.log "entitiy: " + entity
     collection = params.collection
     if entity
         collectionDriver.get collection, entity, ( error, objs ) ->

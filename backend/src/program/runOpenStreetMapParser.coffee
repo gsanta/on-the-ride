@@ -1,4 +1,4 @@
-openStreetMapParser = require( './openStreetMapParser' )
+openStreetMapParser = require( '../service/openStreetMap/openStreetMapParserService' )
 Q = require "q"
 fs = require 'fs'
 
