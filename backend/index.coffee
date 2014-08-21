@@ -46,8 +46,8 @@ app.get "/", ( req, res ) ->
     res.sendfile '../www/index.html'
 
 app.get "/:collection", ( req, res ) ->
-    console.log "collection hivodeik meg"
-    params = req.params;
+    params = req.params
+
     collectionDriver.findAll req.params.collection, ( error, objs ) ->
         if error
             res.send 400, error
@@ -55,12 +55,34 @@ app.get "/:collection", ( req, res ) ->
             res.set "Content-Type", "application/json"
             res.send 200, objs
 
+app.get "/route/:routeName/:zoom", ( req, res ) ->
+    console.log "ez fut le"
+    params = req.params
+    routeName = params.routeName
+    zoom = parseInt params.zoom
+    console.log "collection"
+    console.log routeName
+    console.log "zoom"
+    console.log zoom
+    query = {
+        weight: { $lte: zoom }
+    }
+
+
+    if routeName? and zoom?
+        collectionDriver.query routeName, query, ( error, objs ) ->
+            if error
+                res.send 400, error
+            else
+                res.send 200, objs
+    else
+        res.send 400, { error: 'bad url', url: req.url }
+
 app.get "/:collection/:entity", ( req, res ) ->
-    console.log "ez hivodik meg"
     params = req.params
     entity = params.entity
-    console.log "entitiy: " + entity
     collection = params.collection
+
     if entity
         collectionDriver.get collection, entity, ( error, objs ) ->
             if error

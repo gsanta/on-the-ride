@@ -33,6 +33,19 @@ CollectionDriver.prototype.get = ( collectionName, id, callback ) ->
                 else
                     callback null, doc
 
+CollectionDriver.prototype.query = ( collectionName, queryObj, callback ) ->
+    this.getCollection collectionName, ( error, the_collection ) ->
+        if error
+            callback error
+        else
+            the_collection.find( queryObj ).toArray ( error, results ) ->
+                if error
+                    callback error
+                else
+                    console.log "result"
+                    console.log results.length
+                    callback null, results
+
 CollectionDriver.prototype.save = ( collectionName, obj, callback ) ->
     this.getCollection collectionName, ( error, the_collection ) ->
         if error

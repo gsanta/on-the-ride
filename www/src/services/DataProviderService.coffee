@@ -4,13 +4,15 @@ angular.module 'services'
 	factoryObj = 
 	
 		loadPlaceInfo: ->
-			$http.get('/info');
+			$http.get '/info'
 
+		loadRouteInfo: ( zoom ) ->
+			$http.get "route/eurovelo_6_new/#{zoom}"
 
-		loadRouteInfo: ->
-			$http.get('/eurovelo_6_new');
+		loadMapArea: ( id ) ->
+			$http.get '/map/0'
 
-		savePlaceInfo: ( data ) ->
-			$http.post('/info', data);
+		savePlaceInfo: ( data ) -> 
+			$http.post '/info', data
 
 	factoryObj

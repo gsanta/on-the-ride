@@ -5,9 +5,15 @@ angular.module "controllers"
 	$scope.map = undefined;
 
 	$scope.initMap = ->
-		routeInfoPromise = DataProvider.loadRouteInfo();
+		# DataProvider.loadMapArea( 0 ).success ( data ) ->
+		# 	console.log "loadMapArea"
+		# 	console.log data
+
+		routeInfoPromise = Map.fetchRouteNodes( 0 )
 
 		routeInfoPromise.success ( data ) ->
+			console.log "route"
+			console.log data
 			$scope.routeInfo = data;
 
 			centerCoordinates = Map.createCoordinate data[0].lat, data[0].lon
