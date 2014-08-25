@@ -72,7 +72,7 @@ extractCoordsFromNode = ( node ) ->
 
 addIndexToRouteNodes = ( nodes ) ->
 	for node, index in nodes
-		node.index = index
+		node._id = index
 
 addSiblingsToRouteNodes = ( nodes ) ->
 	for node, index in nodes
@@ -85,7 +85,7 @@ addSiblingsToRouteNodes = ( nodes ) ->
 
 addWeightsToRouteNodes = ( nodes ) ->
 	for node, index in nodes
-		node.weight = index % 14
+		node.weight = index % 9
 
 
 

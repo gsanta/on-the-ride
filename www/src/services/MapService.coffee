@@ -17,18 +17,22 @@ angular.module "services"
 		fetchRouteNodes: ( zoom ) ->
 			DataProvider.loadRouteInfo( zoom )
 
-		createRootFromNodeArray: ( nodeArray, startNode, map ) ->
+		createRouteFromNodeArray: ( nodeArray, zoom ) ->
 			route = [ ];
 
 			nodeAssocMap = {}
 			for node in nodeArray
 				nodeAssocMap[ node._id ] = node
 
-			actNode = startNode
+			actNode = nodeAssocMap[0]
+			1 
 			while actNode != undefined
 				route.push actNode
-				actNode = nodeAssocMap[ actNode.siblings[0] ] 
+				actNode = nodeAssocMap[ actNode.siblings[ 8 - zoom ] ] 
 
+			return route;
+
+		createPolylineFromRoute: ( route ) ->
 			coordinates = []
 			coordinates.push new google.maps.LatLng node.lat, node.lon for node in route
 
@@ -38,9 +42,10 @@ angular.module "services"
 			    strokeColor: '#FF0000',
 			    strokeOpacity: 1.0,
 			    strokeWeight: 2
-			}
+			} 
 
-			routePolyline.setMap( map );
+			return routePolyline
+
 
 		createCoordinate: ( lat, lon ) ->
 			new google.maps.LatLng lat,lon
