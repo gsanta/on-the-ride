@@ -7,9 +7,9 @@ angular.module "controllers"
 	routePolyline = 5
 
 	$scope.loadRoute = ( map_zoom ) ->
-		console.log "loadRoute lefut"
+
 		routePolyline.setMap null
-		routeInfoPromise = Map.fetchRouteNodes( map_zoom - 3 )
+		routeInfoPromise = Map.fetchRouteNodes map_zoom - 3 
 
 
 		routeInfoPromise.success ( data ) ->
@@ -29,8 +29,6 @@ angular.module "controllers"
 		routeInfoPromise = Map.fetchRouteNodes( 0 )
 
 		routeInfoPromise.success ( data ) ->
-			console.log "route"
-			console.log data
 			$scope.routeInfo = data;
 
 			centerCoordinates = Map.createCoordinate data[0].lat, data[0].lon
@@ -48,6 +46,9 @@ angular.module "controllers"
 
 			google.maps.event.addListener $scope.map,'zoom_changed', () ->
 				$scope.loadRoute $scope.map.getZoom()
-				console.log "zoom: #{$scope.map.getZoom()}"
+
+			google.maps.event.addListener $scope.map, "bounds_changed", () ->
+				bounds = $scope.map.getBounds()
+				console.log Map.calculateZoom bounds.Ca.j, bounds.Ca.k, bounds.pa.j, bounds.pa.k
 
 	$scope.infoBoxes = []
