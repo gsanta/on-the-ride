@@ -63,6 +63,32 @@ addWeightsToRouteNodes = ( nodes ) ->
 	for node, index in nodes
 		node.weight = index % 9 + 1
 
+calculateMapIdForNodeAtZoom = ( coord, zoom ) ->
+
+	if coord.lon >= 55
+		coord.lon = 5 - 0.00001
+	if coord.lat <= 30
+		coord.lat = 30 + 0.00001
+
+
+	rowsColumnsAtZoom = Math.pow 2, zoom
+
+	latFullLen = Math.abs( 70 - 30 )
+	lonFullLen = Math.abs( -10 - 55 )
+
+	distFromLatStart = Math.abs 70 - coord.lat
+	distFromLonStart = Math.abs -10 - coord.lon
+
+	latLenAtZoom = latFullLen / rowsColumnsAtZoom
+	lonLenAtZoom = lonFullLen / rowsColumnsAtZoom
+
+	row = Math.floor( distFromLatStart / latLenAtZoom ) + 1
+	column = Math.floor( distFromLonStart / lonLenAtZoom ) + 1
+
+	mapIdOffset = 0
+	for index in [ 0...zoom ]
+		mapIdOffset += Math.pow 4, index
+	mapIdOffset + ( row - 1 ) * rowsColumnsAtZoom + column - 1
 
 module.exports.getRootMap = getRootMap 
 module.exports.getMap = getMap
@@ -71,4 +97,5 @@ module.exports.containsNode = containsNode
 module.exports.findLeafMap = findLeafMap 
 module.exports.addSiblingsToRouteNodes = addSiblingsToRouteNodes
 module.exports.addWeightsToRouteNodes = addWeightsToRouteNodes
-module.exports.addIndexToRouteNodes = addIndexToRouteNodes
+module.exports.addIndexToRouteNodes = addIndexToRouteNodes 
+module.exports.calculateMapIdForNodeAtZoom = calculateMapIdForNodeAtZoom
