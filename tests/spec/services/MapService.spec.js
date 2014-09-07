@@ -115,4 +115,39 @@ describe("MapService", function () {
             MapConstants.max_zoom = originalMaxZoom;
         });
     })
+
+    describe("When calculating zoomId for node", function() {
+        describe("When the zoom is 0", function() {
+            it("should give 0 for every node (within the boundaries) at zoom 0", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(70, -10, 0)).toBe(0);
+                expect(MapService.calculateMapIdForNodeAtZoom(70, 22.5, 0)).toBe(0);
+                expect(MapService.calculateMapIdForNodeAtZoom(50, 22.5, 0)).toBe(0);
+                expect(MapService.calculateMapIdForNodeAtZoom(30.001, 54.999, 0)).toBe(0);
+            });
+        });
+
+        describe("When the zoom is 1", function() {
+            it("should give 4 for (40,38.75) at zoom 1 ", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(40, 38.75, 1)).toBe(4);
+            });
+
+            it("should give 4 for (50,22.5) at zoom 1 ", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(50, 22.5, 1)).toBe(4);
+            });
+        });
+
+        describe("When the zoom is 2", function() {
+            it("should give 5 for (70,-10) at zoom 2 ", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(70, -10, 2)).toBe(5);
+            });
+
+            it("should give 10 for (60,6.25) at zoom 2 ", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(60, 6.25, 2)).toBe(10);
+            });
+
+            it("should give 14 for (45,14.375) at zoom 2 ", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(45, 14.375, 2)).toBe(14);
+            });
+        });
+    })
 });

@@ -29,17 +29,22 @@ containsNode = ( node, map ) ->
 		return true
 	return false
 
-findLeafMapRecursively = ( node, map, callback ) ->
-	if map.childAreaIds.length == 0
-		callback map
+findLeafMap = ( node, map, callback ) -> 
 
-	childPromises = getMapChildren( map )
-	for childPromis in childPromises
-		childPromis.then ( data ) ->
-			if containsNode node, data
-				findLeafMapRecursively node, data, callback
+	findLeafMapRecursively( node, map, parentMapIds, callback ) ->
+		if map.childAreaIds.length == 0
+			callback parentMapIds
 
-	Q.all childPromises
+		childPromises = getMapChildren( map )
+		for childPromis in childPromises
+			childPromis.then ( data ) ->
+				if containsNode node, data
+					parentMapIds.push data._id
+					findLeafMapRecursively node, data, parentMapIds, callback
+
+		Q.all childPromises
+
+	findLeafMapRecursively( node, map, [ map._id ], callback)
 
 addIndexToRouteNodes = ( nodes ) ->
 	for node, index in nodes
@@ -63,7 +68,7 @@ module.exports.getRootMap = getRootMap
 module.exports.getMap = getMap
 module.exports.getMapChildren = getMapChildren 
 module.exports.containsNode = containsNode 
-module.exports.findLeafMapRecursively = findLeafMapRecursively 
+module.exports.findLeafMap = findLeafMap 
 module.exports.addSiblingsToRouteNodes = addSiblingsToRouteNodes
 module.exports.addWeightsToRouteNodes = addWeightsToRouteNodes
 module.exports.addIndexToRouteNodes = addIndexToRouteNodes

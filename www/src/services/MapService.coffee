@@ -89,5 +89,25 @@ angular.module "services"
 
 		createCoordinate: ( lat, lon ) ->
 			new google.maps.LatLng lat,lon
+
+		calculateMapIdForNodeAtZoom: ( lat, lon, zoom ) ->
+			rowsColumnsAtZoom = Math.pow 2, zoom
+
+			latFullLen = Math.abs( MapConstants.latStart - MapConstants.latEnd )
+			lonFullLen = Math.abs( MapConstants.lonStart - MapConstants.lonEnd )
+
+			distFromLatStart = Math.abs MapConstants.latStart - lat
+			distFromLonStart = Math.abs MapConstants.lonStart - lon
+
+			latLenAtZoom = latFullLen / rowsColumnsAtZoom
+			lonLenAtZoom = lonFullLen / rowsColumnsAtZoom
+
+			row = Math.floor( distFromLatStart / latLenAtZoom ) + 1
+			column = Math.floor( distFromLonStart / lonLenAtZoom ) + 1
+
+			mapIdOffset = 0
+			for index in [ 0...zoom ]
+				mapIdOffset += Math.pow 4, index
+			mapIdOffset + ( row - 1 ) * rowsColumnsAtZoom + column - 1
 		
 	factoryObj;

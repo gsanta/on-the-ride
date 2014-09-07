@@ -31,9 +31,8 @@ mongodb.MongoClient.connect "mongodb://localhost:27017", ( err, mongoClient ) ->
 				findParentMapAndAddToNode node, map
 
 findParentMapAndAddToNode = ( node, rootMap ) ->
-	routeManipulation.findLeafMapRecursively node, rootMap, ( finalMap ) ->
-		console.log "found"
-		node.mapId = finalMap._id	
+	routeManipulation.findLeafMap node, rootMap, ( parentMapIds ) -> 
+		node.mapIds = parentMapIds	
 		collectionDriver.save "eurovelo_6", node, ( error, obj ) ->
 			if error
 				console.log 'Error: ' + err
