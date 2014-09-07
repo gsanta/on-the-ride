@@ -14,6 +14,8 @@ module.exports = function(config){
       'www/js/controllers/index.js',
       'www/js/services/index.js',
       'www/js/services/DataProviderService.js',
+      'www/js/classes/index.js',
+      'www/js/classes/Coord.js',
       'www/js/**/*.js',
       /*'tests/helper.js',*/
       'tests/spec/**/*.spec.js'

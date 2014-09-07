@@ -1,4 +1,4 @@
-angular.module 'starter', [ 'ionic', 'controllers', 'services' ]
+angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
 .run ( $ionicPlatform ) ->
   $ionicPlatform.ready ->
 

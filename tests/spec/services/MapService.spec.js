@@ -1,14 +1,15 @@
 describe("MapService", function () {
 
-    var $scope, ctrl, $timeout, MapService, MapConstants
+    var $scope, ctrl, $timeout, MapService, MapConstants, Coord
 
     beforeEach(function () {
 
         module("starter");
 
-        inject(function(_Map_, _MapConstants_) {
+        inject(function(_Map_, _MapConstants_, _Coord_) {
             MapService = _Map_;
             MapConstants = _MapConstants_;
+            Coord = _Coord_;
         });
     });
 
@@ -116,38 +117,97 @@ describe("MapService", function () {
         });
     })
 
-    describe("When calculating zoomId for node", function() {
+    describe("When calculating mapId for node", function() {
         describe("When the zoom is 0", function() {
-            it("should give 0 for every node (within the boundaries) at zoom 0", function() {
-                expect(MapService.calculateMapIdForNodeAtZoom(70, -10, 0)).toBe(0);
-                expect(MapService.calculateMapIdForNodeAtZoom(70, 22.5, 0)).toBe(0);
-                expect(MapService.calculateMapIdForNodeAtZoom(50, 22.5, 0)).toBe(0);
-                expect(MapService.calculateMapIdForNodeAtZoom(30.001, 54.999, 0)).toBe(0);
+            it("should give 0 for every node (within the boundaries)", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( -10, 70 ), 0)).toBe(0);
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( 22.5, 70 ), 0)).toBe(0);
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( 22.5, 50 ), 0)).toBe(0);
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( 54.999, 30.001 ), 0)).toBe(0);
             });
         });
 
         describe("When the zoom is 1", function() {
-            it("should give 4 for (40,38.75) at zoom 1 ", function() {
-                expect(MapService.calculateMapIdForNodeAtZoom(40, 38.75, 1)).toBe(4);
+            it("should give 4 for coord (40,38.75) at zoom 1 ", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( 38.75, 40 ), 1)).toBe(4);
             });
 
-            it("should give 4 for (50,22.5) at zoom 1 ", function() {
-                expect(MapService.calculateMapIdForNodeAtZoom(50, 22.5, 1)).toBe(4);
+            it("should give 4 for coord (50,22.5) at zoom 1 ", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( 22.5, 50 ), 1)).toBe(4);
             });
         });
 
         describe("When the zoom is 2", function() {
-            it("should give 5 for (70,-10) at zoom 2 ", function() {
-                expect(MapService.calculateMapIdForNodeAtZoom(70, -10, 2)).toBe(5);
+            it("should give 5 for coord (70,-10)", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( -10, 70 ), 2)).toBe(5);
             });
 
-            it("should give 10 for (60,6.25) at zoom 2 ", function() {
-                expect(MapService.calculateMapIdForNodeAtZoom(60, 6.25, 2)).toBe(10);
+            it("should give 10 for coord (60,6.25)", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( 6.25, 60 ), 2)).toBe(10);
             });
 
-            it("should give 14 for (45,14.375) at zoom 2 ", function() {
-                expect(MapService.calculateMapIdForNodeAtZoom(45, 14.375, 2)).toBe(14);
+            it("should give 14 for coord (45,14.375)", function() {
+                expect(MapService.calculateMapIdForNodeAtZoom(new Coord( 14.375, 45 ), 2)).toBe(14);
             });
+        });
+    })
+
+    describe("When calculating mapIds for area", function() {
+        describe("When the zoom is 0", function() {
+            it("should give 0 for every area", function() {
+                var mapIds = MapService.getMapsForAreaAtZoom(new Coord( -9, 71 ), new Coord( 56, 29 ), 0);
+                expect(mapIds.length).toBe(1)
+                expect(mapIds[0]).toBe(0);
+            });
+        });
+
+        describe("When the zoom is 1", function() {
+            it("should give 1 for area (-1.875, 65),(14.375, 55)", function() { 
+                expect(MapService.getMapsForAreaAtZoom(new Coord( -1.875, 65 ), new Coord( 14.375, 55 ), 1)[0]).toBe(1);
+            }); 
+
+            it("should give [1,2,3,4] for area (6.25, 60),(38.75, 40)", function() { 
+                var mapIds = MapService.getMapsForAreaAtZoom(new Coord( 6.25, 60 ), new Coord( 38.75, 40 ), 1);
+                expect(mapIds.length).toBe(4);
+                expect(mapIds[0]).toBe(1);
+                expect(mapIds[1]).toBe(2);
+                expect(mapIds[2]).toBe(3);
+                expect(mapIds[3]).toBe(4);
+            }); 
+
+            it("should give [3,4] for area (14.375, 45),(30.625, 35)", function() { 
+                var mapIds = MapService.getMapsForAreaAtZoom(new Coord( 14.375, 45 ), new Coord( 30.625, 35 ), 1);
+                expect(mapIds.length).toBe(2);
+                expect(mapIds[0]).toBe(3);
+                expect(mapIds[1]).toBe(4);
+            }); 
+        });
+
+        describe("When the zoom is 2", function() {
+            it("should give [14,15,18,19] for area (14.375, 45),(30.625, 35)", function() { 
+                var mapIds = MapService.getMapsForAreaAtZoom(new Coord( 14.375, 45 ), new Coord( 30.625, 35 ), 2);
+                expect(mapIds.length).toBe(4);
+                expect(mapIds[0]).toBe(14);
+                expect(mapIds[1]).toBe(15);
+                expect(mapIds[2]).toBe(18);
+                expect(mapIds[3]).toBe(19);
+            }); 
+
+            it("should give [14,15,18,19] for area (6.25, 50),(22.5, 40)", function() { 
+                var mapIds = MapService.getMapsForAreaAtZoom(new Coord( 6.25, 50 ), new Coord( 22.5, 40 ), 2);
+                expect(mapIds.length).toBe(4);
+                expect(mapIds[0]).toBe(14);
+                expect(mapIds[1]).toBe(15);
+                expect(mapIds[2]).toBe(18);
+                expect(mapIds[3]).toBe(19);
+            }); 
+
+            it("should give [20] for area (38.75, 40),(55, 30)", function() { 
+                var mapIds = MapService.getMapsForAreaAtZoom(new Coord( 38.75, 40 ), new Coord( 55, 30 ), 2);
+                console.log(mapIds)
+                expect(mapIds.length).toBe(1);
+                expect(mapIds[0]).toBe(20); 
+            }); 
         });
     })
 });

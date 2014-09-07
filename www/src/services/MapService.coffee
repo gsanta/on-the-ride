@@ -1,5 +1,5 @@
 angular.module "services"
-.factory "Map", ( DataProvider, MapConstants ) ->
+.factory "Map", ( DataProvider, MapConstants, Coord ) ->
 
 	mapZoomDiameterSquares = [
 		5825,
@@ -90,14 +90,21 @@ angular.module "services"
 		createCoordinate: ( lat, lon ) ->
 			new google.maps.LatLng lat,lon
 
-		calculateMapIdForNodeAtZoom: ( lat, lon, zoom ) ->
+		calculateMapIdForNodeAtZoom: ( coord, zoom ) ->
+
+			if coord.lon >= MapConstants.lonEnd
+				coord.lon = MapConstants.lonEnd - 0.00001
+			if coord.lat <= MapConstants.latEnd
+				coord.lat = MapConstants.latEnd + 0.00001
+
+
 			rowsColumnsAtZoom = Math.pow 2, zoom
 
 			latFullLen = Math.abs( MapConstants.latStart - MapConstants.latEnd )
 			lonFullLen = Math.abs( MapConstants.lonStart - MapConstants.lonEnd )
 
-			distFromLatStart = Math.abs MapConstants.latStart - lat
-			distFromLonStart = Math.abs MapConstants.lonStart - lon
+			distFromLatStart = Math.abs MapConstants.latStart - coord.lat
+			distFromLonStart = Math.abs MapConstants.lonStart - coord.lon
 
 			latLenAtZoom = latFullLen / rowsColumnsAtZoom
 			lonLenAtZoom = lonFullLen / rowsColumnsAtZoom
@@ -109,5 +116,25 @@ angular.module "services"
 			for index in [ 0...zoom ]
 				mapIdOffset += Math.pow 4, index
 			mapIdOffset + ( row - 1 ) * rowsColumnsAtZoom + column - 1
+
+		getMapsForAreaAtZoom: ( topLeftCoord, bottomRightCoord, zoom ) ->
+			bottomLeftCoord = new Coord topLeftCoord.lon, bottomRightCoord.lat
+			topRightCoord = new Coord bottomRightCoord.lon, topLeftCoord.lat
+
+			tlId = this.calculateMapIdForNodeAtZoom topLeftCoord, zoom
+			trId = this.calculateMapIdForNodeAtZoom topRightCoord, zoom
+			blId = this.calculateMapIdForNodeAtZoom bottomLeftCoord, zoom
+			brId = this.calculateMapIdForNodeAtZoom bottomRightCoord, zoom
+			
+			set = {}
+			set[tlId] = 1; set[trId] = 1; set[blId] = 1; set[brId] = 1
+
+			ids = []
+
+			for k,v of set
+				ids.push parseInt k, 10
+			ids
+
+
 		
 	factoryObj;
