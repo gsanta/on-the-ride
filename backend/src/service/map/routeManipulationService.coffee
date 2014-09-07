@@ -41,17 +41,29 @@ findLeafMapRecursively = ( node, map, callback ) ->
 
 	Q.all childPromises
 
-iterateRoute = ( routeName, updaterCallback ) ->
-	counter = 0
-	collectionDriver.get routeName, 0, ( error, node ) ->
-		updaterCallback  node, counter 
-		counter++
-	collectionDriver.findAll routeName, ( error, route ) ->
-		for node in route
+addIndexToRouteNodes = ( nodes ) ->
+	for node, index in nodes
+		node._id = index
+
+addSiblingsToRouteNodes = ( nodes ) ->
+	for node, index in nodes
+		node.siblings = []
+		for i in [ 1...10 ]
+			if nodes.length > index + i
+				node.siblings.push ( index + i )
+			else
+				break
+
+addWeightsToRouteNodes = ( nodes ) ->
+	for node, index in nodes
+		node.weight = index % 9 + 1
+
 
 module.exports.getRootMap = getRootMap 
 module.exports.getMap = getMap
 module.exports.getMapChildren = getMapChildren 
 module.exports.containsNode = containsNode 
 module.exports.findLeafMapRecursively = findLeafMapRecursively 
-module.exports.iterateRoute = iterateRoute 
+module.exports.addSiblingsToRouteNodes = addSiblingsToRouteNodes
+module.exports.addWeightsToRouteNodes = addWeightsToRouteNodes
+module.exports.addIndexToRouteNodes = addIndexToRouteNodes

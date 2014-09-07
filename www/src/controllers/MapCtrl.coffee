@@ -9,11 +9,11 @@ angular.module "controllers"
 	$scope.loadRoute = ( map_zoom ) ->
 
 		routePolyline.setMap null
-		routeInfoPromise = Map.fetchRouteNodes map_zoom - 3 
+		routeInfoPromise = Map.fetchRouteNodes map_zoom - 2
 
 
 		routeInfoPromise.success ( data ) ->
-			route = Map.createRouteFromNodeArray data, map_zoom - 3
+			route = Map.createRouteFromNodeArray data, map_zoom - 2
 
 			routePolyline = Map.createPolylineFromRoute route
 
@@ -26,18 +26,17 @@ angular.module "controllers"
 		# 	console.log "loadMapArea"
 		# 	console.log data
 
-		routeInfoPromise = Map.fetchRouteNodes( 0 )
+		routeInfoPromise = Map.fetchRouteNodes( 1 ) 
 
 		routeInfoPromise.success ( data ) ->
 			$scope.routeInfo = data;
 
 			centerCoordinates = Map.createCoordinate data[0].lat, data[0].lon
 
-			$scope.map = Map.createMap centerCoordinates, 3, document.getElementById "googleMap"
-
+			$scope.map = new google.maps.Map document.getElementById( "googleMap" ), Map.createMapProperties( centerCoordinates, 3 )
 			$scope.map.getBounds()
 
-			route = Map.createRouteFromNodeArray data, 0
+			route = Map.createRouteFromNodeArray data, 1
 
 			routePolyline = Map.createPolylineFromRoute route
 

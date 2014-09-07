@@ -34,7 +34,7 @@ findParentMapAndAddToNode = ( node, rootMap ) ->
 	routeManipulation.findLeafMapRecursively node, rootMap, ( finalMap ) ->
 		console.log "found"
 		node.mapId = finalMap._id	
-		collectionDriver.save "eurovelo_6_new", node, ( error, obj ) ->
+		collectionDriver.save "eurovelo_6", node, ( error, obj ) ->
 			if error
 				console.log 'Error: ' + err
 			else

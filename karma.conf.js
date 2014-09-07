@@ -3,8 +3,14 @@ module.exports = function(config){
     basePath : '.',
 
     files: [
-      'www/lib/ionic/js/ionic.bundle.js',
-      'www/lib/ionic/js/angular/angular-mocks.js',
+      'www/lib/angular/angular.min.js',
+      'www/lib/angular-animate/angular-animate.min.js',
+      'www/lib/angular-sanitize/angular-sanitize.min.js',
+      'www/lib/angular-touch/angular-touch.min.js',
+      'www/lib/angular-ui-router/release/angular-ui-router.min.js',
+      'www/lib/ionic/release/js/ionic.min.js',
+      'www/lib/ionic/release/js/ionic-angular.min.js',  
+      'www/lib/angular-mocks/angular-mocks.js',  
       'www/js/controllers/index.js',
       'www/js/services/index.js',
       'www/js/services/DataProviderService.js',

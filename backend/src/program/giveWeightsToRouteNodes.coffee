@@ -5,15 +5,20 @@ mongodb = require "mongodb"
 Q = require "q"
 file = __dirname + "/../../test.json"
 
+fs.readFile file, 'utf8', ( err, data ) ->
+	if err
+    	console.log 'Error: ' + err
+    	return
+ 
 
-global.collectionDriver = null
+	data = JSON.parse data
+	routeManipulation.addIndexToRouteNodes data
+	routeManipulation.addSiblingsToRouteNodes data
+	routeManipulation.addWeightsToRouteNodes data
 
-mongodb.MongoClient.connect "mongodb://localhost:27017", ( err, mongoClient ) ->
-	if !mongoClient
-		console.error "Error! Exiting... Must start MongoDB first"
-		process.exit(1);
-
-	db = mongoClient.db "on_the_ride"
-	global.collectionDriver = new mongodbHelper.CollectionDriver( db )
-
-	routeManipulation.iterateRoute "eurovelo_6_new"
+	jsonString = JSON.stringify( data, null, 4 )
+	fs.writeFile "finalNodes.json", jsonString, ( err ) ->
+		if err 
+			console.log err
+		else
+			console.log "The file was saved!"  

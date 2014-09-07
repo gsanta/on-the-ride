@@ -1,54 +1,56 @@
 angular.module "services"
-.factory "Map", ( DataProvider ) ->
+.factory "Map", ( DataProvider, MapConstants ) ->
 
-	mapZoomDiameter = [
-		Math.sqrt 5825,
-		Math.sqrt 1456.25,
-		Math.sqrt 364.0625,
-		Math.sqrt 91.016,
-		Math.sqrt 22.754,
-		Math.sqrt 5.691,
-		Math.sqrt 1.422,
-		Math.sqrt 0.3557,
-		Math.sqrt 0.0892
+	mapZoomDiameterSquares = [
+		5825,
+		1456.25,
+		364.0625,
+		91.016,
+		22.754,
+		5.691,
+		1.422,
+		0.3557, 
+		0.0892
 	]
 
-	factoryObj =
+	factoryObj = 
 
-		calculateZoom: (x1, x2, y1, y2) ->
-			x1 = parseFloat x1
+		calculateZoom: (x1, y1, x2, y2) ->
+			x1 = parseFloat x1 
 			x2 = parseFloat x2
 			y1 = parseFloat y1
 			y2 = parseFloat y2
 
-			distance = Math.sqrt ( Math.pow ( x1 - x2 ), 2 + Math.pow ( y1 - y2 ), 2 ) 
-			console.log "dist #{x1}, #{x2}, #{y1}, #{y2}"
-			for dist, index in mapZoomDiameter
-				if dist < distance
+			actDistanceSquare = Math.pow( x1 - x2, 2 ) + Math.pow( y1 - y2, 2 )
+
+			for dist, index in mapZoomDiameterSquares
+				if dist < actDistanceSquare
 					if index == 0
 						return 0
 					else
 						return index - 1
+			return mapZoomDiameterSquares.length - 1
 
-		createMap: ( centerPosition, zoom, domElement ,mapTypeId ) ->
+		createMapProperties: ( centerPosition, zoom, mapTypeId ) ->
 			mapProp =
 				center: centerPosition,
 				zoom: zoom,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 
-			mapProp.mapTypeId = mapTypeId if mapTypeId?
-			
-			new google.maps.Map( domElement, mapProp );
+			mapProp.mapTypeId = mapTypeId if mapTypeId? 
+			mapProp	
 
 
 		fetchRouteNodes: ( zoom ) ->
 			DataProvider.loadRouteInfo( zoom )
 
 		createRouteFromNodeArray: ( nodeArray, zoom ) ->
-			console.log "menniy: #{zoom}"
 
-			if zoom > 8
-				zoom = 8
+			if zoom > MapConstants.max_zoom
+				throw new Error "zoom is bigger than the maximum (use MapConstants.max_zoom)"
+
+			if zoom < 1
+				throw new Error "zoom is smaller than the minimum (use MapConstants.min_zoom)"
 
 			route = [ ]
 
@@ -60,14 +62,13 @@ angular.module "services"
 
 			while actNode != undefined
 				route.push actNode
-				for index in [ 0...zoom ]
+				for index in [ 1...zoom ]
 					actNode = nodeAssocMap[ actNode.siblings[ 0 ] ]
 					if actNode == undefined
 						break
 					route.push actNode
 				if actNode != undefined
-					actNode = nodeAssocMap[ actNode.siblings[ 8 - zoom ] ] 
-			console.log "route.length: #{route.length}"
+					actNode = nodeAssocMap[ actNode.siblings[ MapConstants.max_zoom - zoom ] ] 
 
 			return route;
 

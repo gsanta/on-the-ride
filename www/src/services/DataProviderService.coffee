@@ -7,12 +7,12 @@ angular.module 'services'
 			$http.get '/info'
 
 		loadRouteInfo: ( zoom ) ->
-			$http.get "route/eurovelo_6_new/#{zoom}"
+			ret = $http.get "route/eurovelo_6/#{zoom}"
 
-		loadMapArea: ( id ) ->
+		loadMapArea: ( id ) -> 
 			$http.get '/map/0'
 
 		savePlaceInfo: ( data ) -> 
-			$http.post '/info', data
+			$http.post '/info', data 
 
 	factoryObj
