@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title></title>
 
-    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="lib/ionic/release/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
@@ -13,7 +13,13 @@
     -->
 
     <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="lib/angular/angular.min.js"></script>
+    <script src="lib/angular-animate/angular-animate.min.js"></script>
+    <script src="lib/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="lib/angular-touch/angular-touch.min.js"></script>
+    <script src="lib/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="lib/ionic/release/js/ionic.min.js"></script>
+    <script src="lib/ionic/release/js/ionic-angular.min.js"></script>
 
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
@@ -24,6 +30,7 @@
     <script src="js/services/DataProviderService.js"></script>
     <script src="js/services/MapService.js"></script>
     <script src="js/services/MarkerService.js"></script>
+    <script src="js/services/MapConstants.js"></script>
     <script src="js/controllers/index.js"></script>
     <script src="js/controllers/MapCtrl.js"></script>
     <script src="js/controllers/PlaceInfoCtrl.js"></script>

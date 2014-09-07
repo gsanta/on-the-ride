@@ -7,3 +7,18 @@
 .success {
 	border: 1px solid green;
 }
+
+.google-maps-wrapper {
+	position: relative;
+    padding-bottom: 75%; // This is the aspect ratio
+    height: 0;
+    overflow: hidden;
+}
+
+.google-maps {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
