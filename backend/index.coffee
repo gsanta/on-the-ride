@@ -55,17 +55,23 @@ app.get "/:collection", ( req, res ) ->
             res.set "Content-Type", "application/json"
             res.send 200, objs
 
-app.get "/route/:routeName/:zoom", ( req, res ) ->
+app.get "/route/:routeName/:zoom/:maps", ( req, res ) ->
     console.log "ez fut le"
     params = req.params
     routeName = params.routeName
     zoom = parseInt params.zoom
+    maps = params.maps.split ","
+    for map, index in maps
+        maps[ index ] = parseInt map
+    console.log "maps"
+    console.log maps
     console.log "collection"
     console.log routeName
     console.log "zoom"
     console.log zoom
     query = {
-        weight: { $lte: zoom }
+        weight: { $lte: zoom },
+        mapIds: { $in: maps }
     }
 
 

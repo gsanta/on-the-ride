@@ -1,24 +1,37 @@
 angular.module "controllers"
-.controller 'MapCtrl', ( $scope, $http, Map, DataProvider ) ->
+.controller 'MapCtrl', ( $scope, $http, $timeout, Map, DataProvider, Coord ) ->
+
+	routePolyline = undefined
+	canLoadMapAgain = true
 
 	$scope.routeInfo = undefined;
 	$scope.map = undefined;0
 
-	routePolyline = 5
+	$scope.loadRoute = () ->
+		console.log "lefut"
+		bounds = $scope.map.getBounds()
+		ne = bounds.getNorthEast();
+		sw = bounds.getSouthWest();
+		mapZoom = Map.calculateZoom new Coord( sw.lng(), ne.lat() ), new Coord( ne.lng(), sw.lat() )
+		mapIds =  Map.getMapsForAreaAtZoom new Coord( sw.lng(), ne.lat() ), new Coord( ne.lng(), sw.lat() ), mapZoom
 
-	$scope.loadRoute = ( map_zoom ) ->
+		console.log mapZoom
+		console.log mapIds
 
-		routePolyline.setMap null
-		routeInfoPromise = Map.fetchRouteNodes map_zoom - 2
+
+		routeInfoPromise = Map.fetchRouteNodes mapZoom, mapIds
 
 
 		routeInfoPromise.success ( data ) ->
-			route = Map.createRouteFromNodeArray data, map_zoom - 2
+			route = Map.createRouteFromNodeArray data, mapZoom
 
 			routePolyline = Map.createPolylineFromRoute route
 
-			routePolyline.setMap( $scope.map );
-
+			callback = () ->
+				routePolyline.setMap null
+				routePolyline.setMap( $scope.map );
+				console.log "most setMap"
+			$timeout callback, 6000 
 
 
 	$scope.initMap = ->
@@ -26,7 +39,7 @@ angular.module "controllers"
 		# 	console.log "loadMapArea"
 		# 	console.log data
 
-		routeInfoPromise = Map.fetchRouteNodes( 1 ) 
+		routeInfoPromise = Map.fetchRouteNodes( 1, [ 0 ] ) 
 
 		routeInfoPromise.success ( data ) ->
 			$scope.routeInfo = data;
@@ -44,10 +57,20 @@ angular.module "controllers"
 
 
 			google.maps.event.addListener $scope.map,'zoom_changed', () ->
-				$scope.loadRoute $scope.map.getZoom()
+				if canLoadMapAgain
+					$scope.loadRoute()
+					callback = () ->
+						canLoadMapAgain = true	
+					$timeout callback, 20000
+				canLoadMapAgain = false
+
 
 			google.maps.event.addListener $scope.map, "bounds_changed", () ->
-				bounds = $scope.map.getBounds()
-				console.log Map.calculateZoom bounds.Ca.j, bounds.Ca.k, bounds.pa.j, bounds.pa.k
+				if canLoadMapAgain
+					$scope.loadRoute()
+					callback = () ->
+						canLoadMapAgain = true	
+					$timeout callback, 20000
+				canLoadMapAgain = false
 
 	$scope.infoBoxes = []

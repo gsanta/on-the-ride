@@ -15,20 +15,20 @@ describe("MapService", function () {
 
     describe("When calculating the zoom", function() {
         it("should give 0 when called for areas bigger or equal to zoom 0", function() {
-            expect(MapService.calculateZoom(71,-10,30.1,56)).toEqual(0);
-            expect(MapService.calculateZoom(70,-10,30,55)).toEqual(0);
+            expect(MapService.calculateZoom( new Coord( 71,-10 ), new Coord( 30.1,56 ) ) ).toEqual(0);
+            expect(MapService.calculateZoom( new Coord( 70,-10 ), new Coord( 30,55 ) ) ).toEqual(0);
         });
 
         it("should give 2 when called for an area that is equal to zoom 2", function() {
-            expect(MapService.calculateZoom(70,-10,60,6.25)).toEqual(2); 
+            expect(MapService.calculateZoom( new Coord( 70,-10 ), new Coord( 60,6.25 ) ) ).toEqual(2); 
         });
 
         it("should give 2 when called for areas between zoom 2 and 3", function() {
-            expect(MapService.calculateZoom(70,-10,60.1,6.251)).toEqual(2);
+            expect(MapService.calculateZoom( new Coord( 70,-10 ), new Coord( 60.1,6.251 ) ) ).toEqual(2);
         });
 
         it("should give 8 when called for areas less than zoom 8", function() {
-            expect(MapService.calculateZoom(70,-10,69.99999,-9.9999)).toEqual(8);
+            expect(MapService.calculateZoom( new Coord( 70,-10 ), new Coord( 69.99999,-9.9999 ) ) ).toEqual(8);
         });
     })
 

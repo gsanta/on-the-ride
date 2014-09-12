@@ -6,8 +6,9 @@ angular.module 'services'
 		loadPlaceInfo: ->
 			$http.get '/info'
 
-		loadRouteInfo: ( zoom ) ->
-			ret = $http.get "route/eurovelo_6/#{zoom}"
+		loadRouteInfo: ( zoom, maps ) ->
+			mapsStr = maps.join()
+			ret = $http.get "route/eurovelo_6/#{zoom}/#{mapsStr}"
 
 		loadMapArea: ( id ) -> 
 			$http.get '/map/0'

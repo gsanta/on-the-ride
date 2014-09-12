@@ -15,21 +15,21 @@ angular.module "services"
 
 	factoryObj = 
 
-		calculateZoom: (x1, y1, x2, y2) ->
-			x1 = parseFloat x1 
-			x2 = parseFloat x2
-			y1 = parseFloat y1
-			y2 = parseFloat y2
+		calculateZoom: ( topLeftCoord, bottomRightCoord ) ->
+			lon1 = parseFloat topLeftCoord.lon 
+			lon2 = parseFloat bottomRightCoord.lon
+			lat1 = parseFloat topLeftCoord.lat
+			lat2 = parseFloat bottomRightCoord.lat
 
-			actDistanceSquare = Math.pow( x1 - x2, 2 ) + Math.pow( y1 - y2, 2 )
+			actDistanceSquare = Math.pow( lon1 - lon2, 2 ) + Math.pow( lat1 - lat2, 2 )
 
 			for dist, index in mapZoomDiameterSquares
 				if dist < actDistanceSquare
 					if index == 0
-						return 0
+						return 1
 					else
-						return index - 1
-			return mapZoomDiameterSquares.length - 1
+						return index
+			return mapZoomDiameterSquares.length
 
 		createMapProperties: ( centerPosition, zoom, mapTypeId ) ->
 			mapProp =
@@ -41,8 +41,8 @@ angular.module "services"
 			mapProp	
 
 
-		fetchRouteNodes: ( zoom ) ->
-			DataProvider.loadRouteInfo( zoom )
+		fetchRouteNodes: ( zoom, maps ) ->
+			DataProvider.loadRouteInfo( zoom, maps )
 
 		createRouteFromNodeArray: ( nodeArray, zoom ) ->
 
@@ -58,16 +58,13 @@ angular.module "services"
 			for node in nodeArray
 				nodeAssocMap[ node._id ] = node
 
-			actNode = nodeAssocMap[0]
+			actNode = nodeArray[0]
 
 			while actNode != undefined
 				route.push actNode
-				for index in [ 1...zoom ]
+				if actNode.weight < zoom
 					actNode = nodeAssocMap[ actNode.siblings[ 0 ] ]
-					if actNode == undefined
-						break
-					route.push actNode
-				if actNode != undefined
+				else
 					actNode = nodeAssocMap[ actNode.siblings[ MapConstants.max_zoom - zoom ] ] 
 
 			return route;
@@ -94,8 +91,12 @@ angular.module "services"
 
 			if coord.lon >= MapConstants.lonEnd
 				coord.lon = MapConstants.lonEnd - 0.00001
+			else if coord.lon < MapConstants.lonStart
+				coord.lon = MapConstants.lonStart
 			if coord.lat <= MapConstants.latEnd
 				coord.lat = MapConstants.latEnd + 0.00001
+			else if coord.lat > MapConstants.latStart
+				coord.lat = MapConstants.latStart
 
 
 			rowsColumnsAtZoom = Math.pow 2, zoom
