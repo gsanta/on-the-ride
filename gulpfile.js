@@ -7,6 +7,9 @@ var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
 var jasmine = require('gulp-jasmine');
+var coffee = require('gulp-coffee');
+var karma = require('karma').server;
+var coffeelint = require("gulp-coffeelint");
 
 var paths = {
   sass: ['./scss/**/*.scss']
@@ -28,7 +31,8 @@ gulp.task('sass', function(done) {
 
 gulp.task('watch', function() {
   gulp.watch(paths.sass, ['sass']);
-  gulp.watch(['www/js/*.js', 'spec/*.js'], ['jasmine'])
+  gulp.watch('www/src/**/*.coffee', ['coffeeLint', 'coffee'])
+  gulp.watch(['www/js/**/*.js', 'tests/**/*.js'], ['test'])
 });
 
 gulp.task('install', ['git-check'], function() {
@@ -51,7 +55,26 @@ gulp.task('git-check', function(done) {
   done();
 });
 
-gulp.task('jasmine', function() {
-  gulp.src('spec/*Spec.js')
-  .pipe(jasmine());
-})
+// gulp.task('jasmine', function() {
+//   gulp.src('tests/**/*.spec.js')
+//   .pipe(jasmine());
+// })
+
+gulp.task('test', function (done) {
+  karma.start({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, done);
+});
+
+gulp.task('coffee', function() {
+  gulp.src('www/src/**/*.coffee')
+    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(gulp.dest('www/js'))
+});
+
+gulp.task('coffeeLint', function () {
+    gulp.src('www/src/**/*.coffee')
+    .pipe(coffeelint())
+    .pipe(coffeelint.reporter());
+});

@@ -1,25 +1,25 @@
 angular.module "services"
 .factory "Marker", ->
 
-	factoryObj =
+  factoryObj =
 
-		createMarker: ( position, title, map ) ->
+    createMarker: ( position, title, map ) ->
 
-			marker = new google.maps.Marker {
-			    position: position,
-			    map: map,
-			    title: title
-			}
+      marker = new google.maps.Marker {
+        position: position,
+        map: map,
+        title: title
+      }
 
-			marker
+      marker
 
-	 	createInfoWindow: ( text, map, marker ) ->
-			infowindow = new google.maps.InfoWindow {
-			    content: text
-			}
+    createInfoWindow: ( text, map, marker ) ->
+      infowindow = new google.maps.InfoWindow {
+        content: text
+      }
+      
+      if map? and marker?
+        google.maps.event.addListener marker, 'click', ->
+          infowindow.open($scope.map,marker);
 
-			if map? and marker?
-				google.maps.event.addListener marker, 'click', ->
-					infowindow.open($scope.map,marker);
-
-	factoryObj
+  factoryObj

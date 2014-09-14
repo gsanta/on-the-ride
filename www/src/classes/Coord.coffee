@@ -1,10 +1,10 @@
 angular.module "classes"
 .factory "Coord", () ->
 
-	class Coord
-		constructor: (lon, lat) ->
-			@lat = lat
-			@lon = lon
+  class Coord
+    constructor: (lon, lat) ->
+      @lat = lat
+      @lon = lon
 
-	return Coord
+  return Coord
  

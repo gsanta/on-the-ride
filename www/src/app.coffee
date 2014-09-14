@@ -6,7 +6,7 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar true
 
     if window.StatusBar?
-       StatusBar.styleDefault
+      StatusBar.styleDefault
 
 .config ($stateProvider, $urlRouterProvider) ->
 
@@ -37,4 +37,4 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
     }
   }
 
-  $urlRouterProvider.otherwise '/tab/dash' 
+  $urlRouterProvider.otherwise '/tab/dash'
