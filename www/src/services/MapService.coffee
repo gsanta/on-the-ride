@@ -44,7 +44,7 @@ angular.module "services"
 		fetchRouteNodes: ( zoom, maps ) ->
 			DataProvider.loadRouteInfo( zoom, maps )
 
-		createRouteFromNodeArray: ( nodeArray, zoom ) ->
+		createRouteFromNodeArray: ( nodeArray, zoom, mapIds ) ->
 
 			if zoom > MapConstants.max_zoom
 				throw new Error "zoom is bigger than the maximum (use MapConstants.max_zoom)"
@@ -52,22 +52,45 @@ angular.module "services"
 			if zoom < 1
 				throw new Error "zoom is smaller than the minimum (use MapConstants.min_zoom)"
 
-			route = [ ]
+			createRouteFromStartNode = ( startNode ) ->
+				route = [ ]
+				actNode = startNode
+
+				while actNode != undefined
+					route.push actNode
+					if actNode.weight < zoom
+						actNode = nodeAssocMap[ actNode.siblings[ 0 ] ]
+					else
+						actNode = nodeAssocMap[ actNode.siblings[ MapConstants.max_zoom - zoom ] ]
+				route
 
 			nodeAssocMap = {}
 			for node in nodeArray
 				nodeAssocMap[ node._id ] = node
 
-			actNode = nodeArray[0]
+			startNodes = []
+			for mapId in mapIds
+				startNode = this.getStartNodeFromNodesAtMap nodeArray, mapId
+				if startNode
+					startNodes.push startNode
 
-			while actNode != undefined
-				route.push actNode
-				if actNode.weight < zoom
-					actNode = nodeAssocMap[ actNode.siblings[ 0 ] ]
-				else
-					actNode = nodeAssocMap[ actNode.siblings[ MapConstants.max_zoom - zoom ] ] 
+			finalRoute = []
+			for startNode in startNodes
+				route = createRouteFromStartNode startNode
+				if route.length > finalRoute.length
+					finalRoute = route
 
-			return route;
+			for n,i in finalRoute
+				if n == undefined
+					console.log "undef at #{i}"
+
+			return finalRoute;
+
+		getStartNodeFromNodesAtMap: ( nodes, mapId ) ->
+			for node in nodes
+				if mapId in node.startNodeInMap
+					return  node
+			undefined 
 
 		createPolylineFromRoute: ( route ) ->
 			coordinates = []

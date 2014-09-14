@@ -13,7 +13,7 @@ angular.module "controllers"
 		ne = bounds.getNorthEast();
 		sw = bounds.getSouthWest();
 		mapZoom = Map.calculateZoom new Coord( sw.lng(), ne.lat() ), new Coord( ne.lng(), sw.lat() )
-		mapIds =  Map.getMapsForAreaAtZoom new Coord( sw.lng(), ne.lat() ), new Coord( ne.lng(), sw.lat() ), mapZoom
+		mapIds =  Map.getMapsForAreaAtZoom new Coord( sw.lng(), ne.lat() ), new Coord( ne.lng(), sw.lat() ), mapZoom - 1
 
 		console.log mapZoom
 		console.log mapIds
@@ -23,15 +23,17 @@ angular.module "controllers"
 
 
 		routeInfoPromise.success ( data ) ->
-			route = Map.createRouteFromNodeArray data, mapZoom
+			route = Map.createRouteFromNodeArray data, mapZoom, mapIds
 
+			routePolyline.setMap null
 			routePolyline = Map.createPolylineFromRoute route
+			routePolyline.setMap( $scope.map );
 
-			callback = () ->
-				routePolyline.setMap null
-				routePolyline.setMap( $scope.map );
-				console.log "most setMap"
-			$timeout callback, 6000 
+			# callback = () ->
+			# 	routePolyline.setMap null
+			# 	routePolyline.setMap( $scope.map );
+			# 	console.log "most setMap"
+			# $timeout callback, 6000 
 
 
 	$scope.initMap = ->
@@ -49,7 +51,7 @@ angular.module "controllers"
 			$scope.map = new google.maps.Map document.getElementById( "googleMap" ), Map.createMapProperties( centerCoordinates, 3 )
 			$scope.map.getBounds()
 
-			route = Map.createRouteFromNodeArray data, 1
+			route = Map.createRouteFromNodeArray data, 1, [ 0 ]
 
 			routePolyline = Map.createPolylineFromRoute route
 
@@ -57,12 +59,13 @@ angular.module "controllers"
 
 
 			google.maps.event.addListener $scope.map,'zoom_changed', () ->
-				if canLoadMapAgain
-					$scope.loadRoute()
-					callback = () ->
-						canLoadMapAgain = true	
-					$timeout callback, 20000
-				canLoadMapAgain = false
+				1
+				# if canLoadMapAgain
+				# 	$scope.loadRoute()
+				# 	callback = () ->
+				# 		canLoadMapAgain = true	
+				# 	$timeout callback, 20000
+				# canLoadMapAgain = false
 
 
 			google.maps.event.addListener $scope.map, "bounds_changed", () ->
@@ -70,7 +73,7 @@ angular.module "controllers"
 					$scope.loadRoute()
 					callback = () ->
 						canLoadMapAgain = true	
-					$timeout callback, 20000
+					$timeout callback, 5000
 				canLoadMapAgain = false
 
 	$scope.infoBoxes = []

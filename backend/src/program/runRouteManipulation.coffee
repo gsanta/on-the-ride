@@ -15,10 +15,19 @@ fs.readFile file, 'utf8', ( err, data ) ->
 
 	data = JSON.parse data
 
+	usedMapIds = {
+
+	}
+
 	for node in data
 		node.mapIds = []
+		node.startNodeInMap = []
 		for index in [0..8]
-			node.mapIds.push routeManipulation.calculateMapIdForNodeAtZoom { lon: node.lon, lat: node.lat }, index
+			mapId = routeManipulation.calculateMapIdForNodeAtZoom { lon: node.lon, lat: node.lat }, index
+			node.mapIds.push mapId
+			if usedMapIds[mapId] == undefined and node.weight <= index + 1
+				node.startNodeInMap.push mapId
+				usedMapIds[mapId] = true
 
 	jsonString = JSON.stringify( data, null, 4 )
 	writeFile "reallyFinal.json", jsonString
