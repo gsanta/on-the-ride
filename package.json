@@ -2,9 +2,9 @@
   "name": "node-js-getting-started",
   "version": "0.1.0",
   "description": "A sample Node.js app using Express 4",
-  "main": "backand/index.js",
+  "main": "backend/index.js",
   "scripts": {
-    "start": "node backand/index.js"
+    "start": "node backend/index.js"
   },
   "name": "ionic-project",
   "version": "1.0.0",
