@@ -1,5 +1,13 @@
 {
-  "name": "Aquarium",
-  "description": "Observe several swimming fish.",
-  "launch_path": "/cgi-bin/makepage.cgi?/software/Aquarium"
+  "version": "0.1",
+  "name": "On The Ride",
+  "description": "On The Ride",
+  "launch_path": "/index.html",
+  "icons": {
+    "128": "/img/icon.jpg"
+  },
+  "developer": {
+    "name": "Gergely Santa"
+  },
+  "default_locale": "en"
 }
