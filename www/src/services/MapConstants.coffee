@@ -5,5 +5,6 @@ angular.module "services"
   latStart: 70,
   lonStart: -10,
   latEnd: 30,
-  lonEnd: 55
+  lonEnd: 55,
+  dbPrefix: "on_the_ride"
 }

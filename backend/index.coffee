@@ -63,12 +63,7 @@ app.get "/route/:routeName/:zoom/:maps", ( req, res ) ->
     maps = params.maps.split ","
     for map, index in maps
         maps[ index ] = parseInt map
-    console.log "maps"
-    console.log maps
-    console.log "collection"
-    console.log routeName
-    console.log "zoom"
-    console.log zoom
+        
     query = {
         weight: { $lte: zoom },
         mapIds: { $in: maps }

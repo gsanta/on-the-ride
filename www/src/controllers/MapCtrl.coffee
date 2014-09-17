@@ -1,5 +1,5 @@
 angular.module "controllers"
-.controller 'MapCtrl', ( $scope, $http, $timeout, Map, DataProvider, Coord ) ->
+.controller 'MapCtrl', ( $scope, $http, $timeout, Map, DataProvider, LocalDataProviderService, Coord ) ->
 
   routePolyline = undefined
   canLoadMapAgain = true
@@ -8,7 +8,7 @@ angular.module "controllers"
   $scope.map = undefined
 
   $scope.loadRoute = () ->
-    console.log "lefut"
+
     bounds = $scope.map.getBounds()
     ne = bounds.getNorthEast()
     sw = bounds.getSouthWest()
@@ -41,7 +41,9 @@ angular.module "controllers"
     #   console.log "loadMapArea"
     #   console.log data
 
-    routeInfoPromise = Map.fetchRouteNodes( 1, [ 0 ] )
+    LocalDataProviderService.loadRouteInfo("a","b")
+
+    routeInfoPromise = Map.fetchRouteNodes( 1, [ 0 ] ) 
 
     routeInfoPromise.success ( data ) ->
       $scope.routeInfo = data
