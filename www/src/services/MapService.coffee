@@ -1,5 +1,5 @@
 angular.module "services"
-.factory "Map", ( DataProvider, MapConstants, Coord ) ->
+.factory "Map", ( DataProvider, LocalDataProviderService, MapConstants, Coord ) ->
 
   mapZoomDiameterSquares = [
     5825,
@@ -121,12 +121,14 @@ angular.module "services"
           strokeWeight: 2,
           fillColor: '#FF0000',
           fillOpacity: 0.35,
-          clickable: true,
+          draggable: true,
           map: googleMap,
           center: new google.maps.LatLng node.lat, node.lon
           radius: ( Math.random() * 10 ) + 10
 
-        circles.push new google.maps.Circle(pointOptions);
+        circle = new google.maps.Circle pointOptions 
+        circle._id = node._id
+        circles.push circle
       circles
 
     createCoordinate: ( lat, lon ) ->
@@ -181,6 +183,12 @@ angular.module "services"
         ids.push parseInt k, 10
       ids
 
+    savePoints: ( circles ) ->
 
+      for circle in circles
+        LocalDataProviderService.updateNode circle._id, {
+          lat: circle.center.lat(),
+          lon: circle.center.lng()
+        }
     
   factoryObj

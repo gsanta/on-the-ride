@@ -69,7 +69,9 @@ angular.module 'services'
         cursor.onsuccess = ( e ) ->
           res = e.target.result
           if res
-            route.push res.value
+            node = res.value
+            node._id = res.key
+            route.push node
             res.continue();
 
         transaction.oncomplete = ( e ) ->
@@ -135,6 +137,16 @@ angular.module 'services'
           clearAndpopulateDbFromArray( deferred )
       deferred.promise
 
-      
+    updateNode: ( id, props ) ->
+      transaction = db.transaction [ "eurovelo_6" ], "readwrite"
+      store = transaction.objectStore "eurovelo_6"
+      request = store.put props, id
+
+      request.onsuccess = ( e ) ->
+        console.log "success saving node"
+
+      request.onerror = ( e ) ->
+        console.log "error saving node"
+
 
   factoryObj

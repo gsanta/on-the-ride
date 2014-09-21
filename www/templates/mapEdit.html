@@ -1,5 +1,9 @@
 <ion-view id="view-map-edit" title="MapEdit" ng-controller="MapEditCtrl" ng-init="initMap()">
   <ion-content class="has-header padding">
+    <!--<div ng-if="currentEditableCircle">-->
+  	  Lat: {{currentEditableCircle.center.lat()}}, Lon: {{currentEditableCircle.center.lng()}}
+  	  <button ng-disabled="editedCircles.len == 0" ng-click="savePoints()">Save changes</button>
+    <!--</div>-->
     <h1>Map Edit</h1>
     <div class="google-maps-wrapper ">
 	    <div id="googleMap" class="google-maps">
