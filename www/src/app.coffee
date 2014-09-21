@@ -17,24 +17,24 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
     templateUrl: "templates/tabs.html"
   }
 
-  .state 'tab.dash', {
-    url: '/dash',
+  .state 'tab.map', {
+    url: '/map',
     views: {
-      'tab-dash': {
+      'tab-map': {
         templateUrl: 'templates/map.html',
         controller: 'MapCtrl'
       }
     }
   }
 
-  .state 'tab.friends', {
-    url: '/friends',
+  .state 'tab.mapEdit', {
+    url: '/mapEdit',
     views: {
-      'tab-friends': {
-        templateUrl: 'templates/place_info_form.html',
-        controller: 'PlaceInfoCtrl'
+      'tab-map-edit': {
+        templateUrl: 'templates/mapEdit.html',
+        controller: 'MapEditCtrl'
       }
     }
   }
 
-  $urlRouterProvider.otherwise '/tab/dash'
+  $urlRouterProvider.otherwise '/tab/mapEdit'

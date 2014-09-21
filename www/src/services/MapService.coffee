@@ -21,7 +21,8 @@ angular.module "services"
       lat1 = parseFloat topLeftCoord.lat
       lat2 = parseFloat bottomRightCoord.lat
 
-      actDistanceSquare = Math.pow( lon1 - lon2, 2 ) + Math.pow( lat1 - lat2, 2 )
+      actDistanceSquare = Math.pow( lon1 - lon2, 2 ) +
+                          Math.pow( lat1 - lat2, 2 )
 
       for dist, index in mapZoomDiameterSquares
         if dist < actDistanceSquare
@@ -35,7 +36,7 @@ angular.module "services"
       mapProp =
         center: centerPosition,
         zoom: zoom,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeId: google.maps.MapTypeId.TERRAIN
 
       mapProp.mapTypeId = mapTypeId if mapTypeId?
       mapProp
@@ -47,10 +48,12 @@ angular.module "services"
     createRouteFromNodeArray: ( nodeArray, zoom, mapIds ) ->
 
       if zoom > MapConstants.max_zoom
-        throw new Error "zoom is bigger than the maximum (use MapConstants.max_zoom)"
+        throw new Error "zoom is bigger than the maximum
+                        (use MapConstants.max_zoom)"
 
       if zoom < 1
-        throw new Error "zoom is smaller than the minimum (use MapConstants.min_zoom)"
+        throw new Error "zoom is smaller than the minimum
+                        (use MapConstants.min_zoom)"
 
       createRouteFromStartNode = ( startNode ) ->
         route = [ ]
@@ -62,6 +65,7 @@ angular.module "services"
             actNode = nodeAssocMap[ actNode.siblings[ 0 ] ]
           else
             actNode = nodeAssocMap[ actNode.siblings[ MapConstants.max_zoom - zoom ] ]
+
         route
 
       nodeAssocMap = {}
@@ -106,6 +110,24 @@ angular.module "services"
 
       return routePolyline
 
+    createPointsFromRoute: ( route, googleMap ) ->
+      
+      circles = []
+
+      for node, index in route
+        pointOptions =
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          clickable: true,
+          map: googleMap,
+          center: new google.maps.LatLng node.lat, node.lon
+          radius: ( Math.random() * 10 ) + 10
+
+        circles.push new google.maps.Circle(pointOptions);
+      circles
 
     createCoordinate: ( lat, lon ) ->
       new google.maps.LatLng lat,lon

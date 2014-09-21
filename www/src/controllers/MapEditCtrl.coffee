@@ -1,5 +1,5 @@
 angular.module "controllers"
-.controller 'MapCtrl', ( $scope, $http, $timeout, Map, DataProvider,
+.controller 'MapEditCtrl', ( $scope, $http, $timeout, Map, DataProvider,
   LocalDataProviderService, Coord ) ->
 
   routePolyline = undefined
@@ -52,33 +52,16 @@ angular.module "controllers"
 
       centerCoordinates = Map.createCoordinate data[0].lat, data[0].lon
 
-      $scope.map = new google.maps.Map document.querySelector( '#view-map' ).querySelector( '#googleMap' ), Map.createMapProperties( centerCoordinates, 3 )
+      $scope.map = new google.maps.Map document.querySelector( '#view-map-edit' ).querySelector( '#googleMap' ), Map.createMapProperties( centerCoordinates, 3 )
 
-      $scope.map.getBounds()
+      circles = Map.createPointsFromRoute data, $scope.map
 
-      route = Map.createRouteFromNodeArray data, 1, [ 0 ]
+      for circle, index in circles
 
-      routePolyline = Map.createPolylineFromRoute route
+        closure = ( c ) ->
+          google.maps.event.addListener c, 'click', (e, attr) ->
+            c.setMap null
 
-      routePolyline.setMap( $scope.map )
-
-
-      google.maps.event.addListener $scope.map,'zoom_changed', () ->
-        1
-        # if canLoadMapAgain
-        #   $scope.loadRoute()
-        #   callback = () ->
-        #     canLoadMapAgain = true
-        #   $timeout callback, 20000
-        # canLoadMapAgain = false 
-
-
-      google.maps.event.addListener $scope.map, "bounds_changed", () ->
-        if canLoadMapAgain
-          $scope.loadRoute()
-          callback = () ->
-            canLoadMapAgain = true
-          $timeout callback, 5000
-        canLoadMapAgain = false
+        closure circle
 
   $scope.infoBoxes = []
