@@ -149,4 +149,16 @@ angular.module 'services'
         console.log "error saving node"
 
 
+    addNode: ( node ) ->
+      transaction = db.transaction [ "eurovelo_6" ], "readwrite"
+      store = transaction.objectStore "eurovelo_6"
+      request = store.add node
+
+      request.onsuccess = ( e ) ->
+        console.log "success adding node"
+
+      request.onerror = ( e ) ->
+        console.log "error adding node"
+
+
   factoryObj

@@ -131,6 +131,23 @@ angular.module "services"
         circles.push circle
       circles
 
+    addPointToCenterOfMap: ( googleMap ) ->
+
+      pointOptions =
+        strokeColor: '#00FF00',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#00FF00',
+        fillOpacity: 0.35,
+        draggable: true,
+        map: googleMap,
+        center: googleMap.getCenter()
+        radius: ( Math.random() * 10 ) + 10
+
+      circle = new google.maps.Circle pointOptions 
+      circle._id = -1
+      circle
+
     createCoordinate: ( lat, lon ) ->
       new google.maps.LatLng lat,lon
 
@@ -190,5 +207,12 @@ angular.module "services"
           lat: circle.center.lat(),
           lon: circle.center.lng()
         }
-    
+
+    addPoints: ( circles ) ->
+      for circle in circles
+        LocalDataProviderService.addNode {
+          lat: circle.center.lat(),
+          lon: circle.center.lng()
+        }
+
   factoryObj

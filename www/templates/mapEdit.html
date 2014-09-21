@@ -3,6 +3,7 @@
     <!--<div ng-if="currentEditableCircle">-->
   	  Lat: {{currentEditableCircle.center.lat()}}, Lon: {{currentEditableCircle.center.lng()}}
   	  <button ng-disabled="editedCircles.len == 0" ng-click="savePoints()">Save changes</button>
+      <button ng-click="addPoint()">Add new point</button>
     <!--</div>-->
     <h1>Map Edit</h1>
     <div class="google-maps-wrapper ">

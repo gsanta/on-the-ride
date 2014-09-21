@@ -5,6 +5,43 @@ angular.module "controllers"
   routePolyline = undefined
   canLoadMapAgain = true
 
+  newCircleId = -1
+
+  dragStart = ( c ) ->
+    google.maps.event.addListener c, 'dragstart', ( e ) ->
+      console.log "start"
+      console.log $scope.editedCircles[ c._id ]
+      if $scope.editedCircles[ c._id ] == undefined
+        $scope.editedCircles.len++
+        console.log "len: " + $scope.editedCircles.len
+        $scope.editedCircles[ c._id ] = c
+
+        pointOptions =
+          strokeColor: '#ffff00',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#ffff00',
+          fillOpacity: 0.35,
+          draggable: true,
+          map: c.map,
+          center: c.center
+          radius: c.radius
+
+        c.setOptions pointOptions
+
+      
+      $scope.currentEditableCircle = c
+      $scope.$apply()
+
+  dragEnd = ( c ) ->
+    google.maps.event.addListener c, 'dragend', ( e ) ->
+      $scope.currentEditableCircle = null
+      $scope.$apply() 
+
+  click = ( c ) ->
+    google.maps.event.addListener c, 'click', ( e ) ->
+      1
+
   $scope.routeInfo = undefined
   $scope.map = undefined
 
@@ -69,50 +106,48 @@ angular.module "controllers"
 
       for circle, index in circles
 
-        closureClick = ( c ) ->
-          google.maps.event.addListener c, 'click', ( e ) ->
-            console.log $scope.currentEditableCircle
-            if $scope.currentEditableCircle
-              $scope.currentEditableCircle.setDraggable false
-            $scope.currentEditableCircle = c
-            $scope.editedCircles.push c
-            $scope.$apply() 
-            c.setDraggable true
-            c.strokeColor = "#00FF00"
-            c.fillColor = "#00FF00"
-
-        closureDragstart = ( c ) ->
-          google.maps.event.addListener c, 'dragstart', ( e ) ->
-            console.log "start"
-            console.log $scope.editedCircles[ c._id ]
-            if $scope.editedCircles[ c._id ] == undefined
-              $scope.editedCircles.len++
-              console.log "len: " + $scope.editedCircles.len
-              $scope.editedCircles[ c._id ] = c
-
-            $scope.currentEditableCircle = c
-            $scope.$apply() 
-
-        closureDragend = ( c ) ->
-          google.maps.event.addListener c, 'dragend', ( e ) ->
-            $scope.currentEditableCircle = null
-            $scope.$apply() 
-
-        #closureClick circle
-        closureDragend circle
-        closureDragstart circle
+        dragEnd circle
+        dragStart circle
+        click circle
+        undefined
 
   $scope.savePoints = ->
     console.log "savePoints"
     console.log $scope.editedCircles
-    circles = []
+    updateCircles = []
+    addCircles = []
     for k,v of $scope.editedCircles
       if k != "len"
-        circles.push v
-    Map.savePoints circles
+        pointOptions =
+          strokeColor: '#FF0000',
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: '#FF0000',
+          fillOpacity: 0.35,
+          draggable: true,
+          map: v.map,
+          center: v.center
+          radius: v.radius
+        v.setOptions pointOptions
+
+        if v._id < 0
+          addCircles.push v
+        else
+          updateCircles.push v
+
+
+
+    Map.savePoints updateCircles
+    Map.addPoints addCircles
     $scope.currentEditableCircle = null
     $scope.editedCircles = {
       len: 0
     }
+
+  $scope.addPoint = ->
+    circle = Map.addPointToCenterOfMap $scope.map
+    circle._id = newCircleId--
+    dragStart circle
+    dragEnd circle
 
   $scope.infoBoxes = []
