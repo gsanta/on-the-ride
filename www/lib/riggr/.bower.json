@@ -1,6 +1,6 @@
 {
   "name": "riggr",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "homepage": "https://github.com/Fluidbyte/Riggr",
   "authors": [
     "fluidbyte <kent@fluidbyte.net>"
@@ -28,14 +28,13 @@
     "knockout": "http://knockoutjs.com/downloads/knockout-3.1.0.js",
     "jquery": "2.1.0"
   },
-  "_release": "0.9.7",
+  "_release": "0.9.8",
   "_resolution": {
     "type": "version",
-    "tag": "0.9.7",
-    "commit": "a8e13b91063c11dd8ac2be81b9d3c2b6859b0dfa"
+    "tag": "0.9.8",
+    "commit": "7f63e2db8d194844a5eb2c37609c2cb1b34f53c4"
   },
   "_source": "git://github.com/Fluidbyte/Riggr.git",
   "_target": "~0.9.7",
-  "_originalSource": "riggr",
-  "_direct": true
+  "_originalSource": "riggr"
 }

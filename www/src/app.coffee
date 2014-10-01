@@ -37,4 +37,10 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
     }
   }
 
+  .state 'login', {
+    url: '/login',
+    templateUrl: 'templates/login.html',
+    controller: 'LoginCtrl'
+  } 
+
   $urlRouterProvider.otherwise '/tab/mapEdit'
