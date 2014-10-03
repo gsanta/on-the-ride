@@ -20,6 +20,9 @@ angular.module 'services'
       if !thisDB.objectStoreNames.contains( "eurovelo_6" )
         thisDB.createObjectStore "eurovelo_6", { autoIncrement: true }
 
+      if !thisDB.objectStoreNames.contains( "users" )
+        thisDB.createObjectStore "users", { autoIncrement: true }
+
     connRequest.onerror = ( e ) ->
       console.log "Error"
       console.dir e
@@ -160,5 +163,83 @@ angular.module 'services'
       request.onerror = ( e ) ->
         console.log "error adding node"
 
+    getUser: ( userName ) ->
+      deferred = $q.defer()
+
+      loadUserInfoFromIndexedDb = ( def, userName ) ->
+        transaction = db.transaction [ "eurovelo_6" ], "readonly"
+        store = transaction.objectStore "users"
+        cursor = store.openCursor()
+
+        user = {}
+
+        cursor.onsuccess = ( e ) ->
+          actUser = e.target.result
+          if actUser.value.userName == userName
+            user.id = actUser.key
+            user.userName = actUser.value.userName
+          else 
+            actUser.continue();
+
+        transaction.oncomplete = ( e ) ->
+          def.resolve route
+
+      loadRouteInfoFromIndexedDb( deferred, userName )
+
+      deferred.promise
+
+    addUser: ( User ) ->
+      deferred = $q.defer()
+
+      addUserToIndexedDb = ( def ) ->
+        console.log "addUser"
+        transaction = db.transaction [ "users" ], "readwrite"
+        store = transaction.objectStore "users"
+        request = store.add User
+
+        request.onsuccess = ( e ) ->
+          def.resolve User
+
+        request.onerror = ( e ) ->
+          def.reject "problem with signing up"
+
+      if db
+        addUserToIndexedDb( deferred )
+      else
+        console.log "openRequest"
+        openRequest = openConnection()
+
+        openRequest.onsuccess = ( e ) ->
+          db = e.target.result
+          addUserToIndexedDb( deferred )
+      
+      deferred.promise
+
+    removeUser: ( User ) ->
+      deferred = $q.defer()
+
+      removedUserFromIndexedDb = ( def ) ->
+        console.log "removeUser"
+        transaction = db.transaction [ "users" ], "readwrite"
+        store = transaction.objectStore "users"
+        request = store.delete User.id
+
+        request.onsuccess = ( e ) ->
+          def.resolve User
+
+        request.onerror = ( e ) ->
+          def.reject "problem with deleting user"
+
+      if db
+        removedUserFromIndexedDb( deferred )
+      else
+        console.log "openRequest"
+        openRequest = openConnection()
+
+        openRequest.onsuccess = ( e ) ->
+          db = e.target.result
+          removedUserFromIndexedDb( deferred )
+      
+      deferred.promise
 
   factoryObj

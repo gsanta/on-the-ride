@@ -2,8 +2,8 @@
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  angular.module('services').factory('LoginService', function($http, $q) {
-    var db, factoryObj, idbSupported, openConnection;
+  angular.module('services').factory('LoginService', function($http, $q, $location) {
+    var db, factoryObj, idbSupported, openConnection, redirect;
     idbSupported = false;
     if (__indexOf.call(window, "indexedDB") >= 0) {
       idbSupported = true;
@@ -27,6 +27,10 @@
         return console.dir(e);
       };
       return connRequest;
+    };
+    redirect = function(url) {
+      url = url || '/';
+      return $location.path(url);
     };
     factoryObj = {
       login: function(userName, password) {
@@ -56,22 +60,35 @@
         return deferred.promise;
       },
       addUser: function(User) {
-        var addUserToIndexedDb, deferred;
-        deferred = $q.defer();
-        addUserToIndexedDb = function(def) {
-          var request, store, transaction;
-          transaction = db.transaction(["eurovelo_6"], "readwrite");
-          store = transaction.objectStore("users");
-          request = store.add(User);
-          request.onsuccess = function(e) {
-            return def.resolve(User);
-          };
-          return request.onerror = function(e) {
-            return def.reject("problem with signing up");
-          };
+        var handleResult;
+        handleResult = function(result) {
+          if (typeof result.data.then === "function") {
+            return result.data.then(function(data) {
+              return data;
+            });
+          } else {
+            return data;
+          }
         };
-        addUserToIndexedDb(deferred);
-        return deferred.promise;
+        return $http.post('users/new', User).then(handleResult);
+      },
+      removeUser: function(User) {
+        var handleResult;
+        handleResult = function(result) {
+          if (typeof result.data.then === "function") {
+            return result.data.then(function(data) {
+              return data;
+            });
+          } else {
+            return data;
+          }
+        };
+        return $http["delete"]("users", {
+          id: User.id
+        }).then(handleResult);
+      },
+      getLoggedInUser: function() {
+        return void 0;
       }
     };
     return factoryObj;

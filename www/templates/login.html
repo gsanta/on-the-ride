@@ -1,13 +1,28 @@
-<h1>Login</h1>
+<div ng-controller="LoginCtrl">
+  <h1>Login</h1>
 
-<div class="list">
-  <label class="item item-input">
-    <input type="text" placeholder="First Name">
-  </label>
-  <label class="item item-input">
-    <input type="text" placeholder="Last Name">
-  </label>
-  <label class="item item-input">
-    <textarea placeholder="Comments"></textarea>
-  </label>
+  <div class="list">
+    <label class="item item-input">
+      <input type="text" placeholder="First Name">
+    </label>
+    <label class="item item-input">
+      <input type="text" placeholder="Last Name">
+    </label>
+    <label class="item item-input">
+      <textarea placeholder="Comments"></textarea>
+    </label>
+  </div>
+
+  <div class="list">
+    <label class="item item-input">
+      <input type="text" ng-model="user.name" placeholder="User name">
+    </label>
+    <label class="item item-input">
+      <input type="text" ng-model="user.email" placeholder="Email">
+    </label>
+    <label class="item item-input">
+      <input type="text" ng-model="user.password" placeholder="Password">
+    </label>
+    <button ng-click="signUp(user)">Register</button>
+  </div>
 </div>

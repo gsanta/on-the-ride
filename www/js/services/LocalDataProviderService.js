@@ -18,7 +18,12 @@
         console.log("upgradeneedeed");
         thisDB = e.target.result;
         if (!thisDB.objectStoreNames.contains("eurovelo_6")) {
-          return thisDB.createObjectStore("eurovelo_6", {
+          thisDB.createObjectStore("eurovelo_6", {
+            autoIncrement: true
+          });
+        }
+        if (!thisDB.objectStoreNames.contains("users")) {
+          return thisDB.createObjectStore("users", {
             autoIncrement: true
           });
         }
@@ -166,6 +171,88 @@
         return request.onerror = function(e) {
           return console.log("error adding node");
         };
+      },
+      getUser: function(userName) {
+        var deferred, loadUserInfoFromIndexedDb;
+        deferred = $q.defer();
+        loadUserInfoFromIndexedDb = function(def, userName) {
+          var cursor, store, transaction, user;
+          transaction = db.transaction(["eurovelo_6"], "readonly");
+          store = transaction.objectStore("users");
+          cursor = store.openCursor();
+          user = {};
+          cursor.onsuccess = function(e) {
+            var actUser;
+            actUser = e.target.result;
+            if (actUser.value.userName === userName) {
+              user.id = actUser.key;
+              return user.userName = actUser.value.userName;
+            } else {
+              return actUser["continue"]();
+            }
+          };
+          return transaction.oncomplete = function(e) {
+            return def.resolve(route);
+          };
+        };
+        loadRouteInfoFromIndexedDb(deferred, userName);
+        return deferred.promise;
+      },
+      addUser: function(User) {
+        var addUserToIndexedDb, deferred, openRequest;
+        deferred = $q.defer();
+        addUserToIndexedDb = function(def) {
+          var request, store, transaction;
+          console.log("addUser");
+          transaction = db.transaction(["users"], "readwrite");
+          store = transaction.objectStore("users");
+          request = store.add(User);
+          request.onsuccess = function(e) {
+            return def.resolve(User);
+          };
+          return request.onerror = function(e) {
+            return def.reject("problem with signing up");
+          };
+        };
+        if (db) {
+          addUserToIndexedDb(deferred);
+        } else {
+          console.log("openRequest");
+          openRequest = openConnection();
+          openRequest.onsuccess = function(e) {
+            db = e.target.result;
+            return addUserToIndexedDb(deferred);
+          };
+        }
+        return deferred.promise;
+      },
+      removeUser: function(User) {
+        var deferred, openRequest, removedUserFromIndexedDb;
+        deferred = $q.defer();
+        removedUserFromIndexedDb = function(def) {
+          var request, store, transaction;
+          console.log("removeUser");
+          transaction = db.transaction(["users"], "readwrite");
+          store = transaction.objectStore("users");
+          request = store["delete"](User.id);
+          request.onsuccess = function(e) {
+            return def.resolve(User);
+          };
+          return request.onerror = function(e) {
+            return def.reject("problem with deleting user");
+          };
+        };
+        if (db) {
+          removedUserFromIndexedDb(deferred);
+        } else {
+          console.log("openRequest");
+          openRequest = openConnection();
+          openRequest.onsuccess = function(e) {
+            db = e.target.result;
+            return removedUserFromIndexedDb(deferred);
+          };
+        }
+        return deferred.promise;
       }
     };
     return factoryObj;

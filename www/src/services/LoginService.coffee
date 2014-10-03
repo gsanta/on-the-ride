@@ -1,5 +1,5 @@
 angular.module 'services'
-.factory 'LoginService', ( $http, $q ) ->
+.factory 'LoginService', ( $http, $q, $location ) ->
 
   idbSupported = false
   if "indexedDB" in window
@@ -25,6 +25,41 @@ angular.module 'services'
       console.dir e
 
     connRequest
+
+  redirect = (url) ->
+    url = url || '/';
+    $location.path url
+
+  # // Login form dialog stuff
+  # var loginDialog = null;
+  # function openLoginDialog() {
+  #   if ( loginDialog ) {
+  #     throw new Error('Trying to open a dialog that is already open!');
+  #   }
+  #   loginDialog = $dialog.dialog();
+  #   loginDialog.open('security/login/form.tpl.html', 'LoginFormController').then(onLoginDialogClose);
+  # }
+  # function closeLoginDialog(success) {
+  #   if (loginDialog) {
+  #     loginDialog.close(success);
+  #   }
+  # }
+  # function onLoginDialogClose(success) {
+  #   loginDialog = null;
+  #   if ( success ) {
+  #     queue.retryAll();
+  #   } else {
+  #     queue.cancelAll();
+  #     redirect();
+  #   }
+  # }
+
+  # // Register a handler for when an item is added to the retry queue
+  # queue.onItemAddedCallbacks.push(function(retryItem) {
+  #   if ( queue.hasMore() ) {
+  #     service.showLogin();
+  #   }
+  # });
 
   factoryObj = 
     login: ( userName, password ) ->
@@ -53,21 +88,26 @@ angular.module 'services'
       deferred.promise
 
     addUser: ( User ) ->
-      deferred = $q.defer()
+      handleResult = ( result ) ->
+        if typeof result.data.then == "function"  
+          result.data.then  ( data ) ->
+            return data
+        else 
+          return data
+      return $http.post('users/new', User)
+        .then ( handleResult )
 
-      addUserToIndexedDb = ( def ) ->
-        transaction = db.transaction [ "eurovelo_6" ], "readwrite"
-        store = transaction.objectStore "users"
-        request = store.add User
+    removeUser: ( User ) ->
+      handleResult = ( result ) ->
+        if typeof result.data.then == "function"  
+          result.data.then  ( data ) ->
+            return data
+        else 
+          return data
+      return $http.delete("users", {id: User.id})
+        .then ( handleResult )
 
-        request.onsuccess = ( e ) ->
-          def.resolve User
-
-        request.onerror = ( e ) ->
-          def.reject "problem with signing up"
-
-      addUserToIndexedDb( deferred )
-      deferred.promise
-
+    getLoggedInUser: ->
+      return undefined
 
   factoryObj

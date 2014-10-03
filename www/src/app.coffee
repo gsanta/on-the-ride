@@ -1,5 +1,6 @@
 angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
-.run ( $ionicPlatform ) ->
+.run ( $ionicPlatform, $rootScope, $location ) ->
+
   $ionicPlatform.ready ->
 
     if window.cordova? and window.cordova.plugins.Keyboard?
@@ -34,7 +35,7 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
         templateUrl: 'templates/mapEdit.html',
         controller: 'MapEditCtrl'
       }
-    }
+    },
   }
 
   .state 'login', {
