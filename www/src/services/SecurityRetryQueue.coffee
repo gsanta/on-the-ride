@@ -2,7 +2,7 @@ angular.module 'services'
 
 # This is a generic retry queue for security failures.  
 # Each item is expected to expose two functions: retry and cancel.
-.factory 'securityRetryQueue', ( $q, $log ) ->
+.factory 'SecurityRetryQueue', ( $q, $log ) ->
   retryQueue = []
   service =
     # The security service puts its own handler in here!

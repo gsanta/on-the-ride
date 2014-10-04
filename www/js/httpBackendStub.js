@@ -2,14 +2,26 @@
 (function() {
   angular.module('starter').config(function($provide) {
     return $provide.decorator('$httpBackend', angular.mock.e2e.$httpBackendDecorator);
-  }).run(function($httpBackend, LocalDataProviderService, $q) {
+  }).run(function($httpBackend, LocalDataProviderService, LoginService, $q) {
     $httpBackend.whenPOST('users/new').respond(function(method, url, data) {
       var promise;
       promise = LocalDataProviderService.addUser(data);
-      return [200, promise, {}];
+      return [401, promise, {}];
     });
     $httpBackend.whenDELETE('users').respond(function(method, url, data) {
       return console.log("deleting");
+    });
+    $httpBackend.whenPOST('login').respond(function(method, url, data) {
+      var obj, promise;
+      obj = angular.fromJson(data);
+      promise = LocalDataProviderService.getUser(obj.userName, obj.password);
+      return [200, promise, {}];
+    });
+    $httpBackend.whenPOST('signUp').respond(function(method, url, data) {
+      var obj, promise;
+      obj = angular.fromJson(data);
+      promise = LocalDataProviderService.addUser(obj);
+      return [200, promise, {}];
     });
     return $httpBackend.whenGET(/templates\/.*/).passThrough();
   });

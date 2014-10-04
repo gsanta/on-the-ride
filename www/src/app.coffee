@@ -1,5 +1,5 @@
 angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
-.run ( $ionicPlatform, $rootScope, $location ) ->
+.run ( $ionicPlatform, $rootScope, $location, LoginService ) ->
 
   $ionicPlatform.ready ->
 
@@ -9,7 +9,7 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
     if window.StatusBar?
       StatusBar.styleDefault
 
-.config ($stateProvider, $urlRouterProvider) ->
+.config ($stateProvider, $urlRouterProvider ) ->
 
   $stateProvider
   .state 'tab', {
@@ -36,6 +36,18 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
         controller: 'MapEditCtrl'
       }
     },
+    resolve: {
+      auth: ( $q, $injector, LoginService ) ->
+        # userName = LoginService.getSignedInUser()
+        # $q.when( userName )
+        # .then(
+        #   () ->
+        #     console.log "resolved"
+        #   ,() ->
+        #     console.log "not resolved"
+        # )
+        return LoginService.getSignedInUser()
+    }
   }
 
   .state 'login', {

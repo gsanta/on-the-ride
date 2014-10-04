@@ -163,28 +163,40 @@ angular.module 'services'
       request.onerror = ( e ) ->
         console.log "error adding node"
 
-    getUser: ( userName ) ->
+    getUser: ( userName, password ) ->
       deferred = $q.defer()
 
-      loadUserInfoFromIndexedDb = ( def, userName ) ->
-        transaction = db.transaction [ "eurovelo_6" ], "readonly"
+      loadUserInfoFromIndexedDb = ( def ) ->
+        transaction = db.transaction [ "users" ], "readonly"
         store = transaction.objectStore "users"
         cursor = store.openCursor()
 
-        user = {}
+        user = undefined
 
         cursor.onsuccess = ( e ) ->
           actUser = e.target.result
-          if actUser.value.userName == userName
-            user.id = actUser.key
-            user.userName = actUser.value.userName
-          else 
-            actUser.continue();
+          if actUser?
+            if actUser.value? && actUser.value.userName == userName
+              user = 
+                id: actUser.key
+                userName: actUser.value.userName
+            else 
+              actUser.continue();
 
         transaction.oncomplete = ( e ) ->
-          def.resolve route
+          if user
+            def.resolve user
+          else def.reject "login error"
 
-      loadRouteInfoFromIndexedDb( deferred, userName )
+      if db
+        loadUserInfoFromIndexedDb( deferred )
+      else
+        console.log "openRequest"
+        openRequest = openConnection()
+
+        openRequest.onsuccess = ( e ) ->
+          db = e.target.result
+          loadUserInfoFromIndexedDb( deferred )
 
       deferred.promise
 
@@ -192,7 +204,6 @@ angular.module 'services'
       deferred = $q.defer()
 
       addUserToIndexedDb = ( def ) ->
-        console.log "addUser"
         transaction = db.transaction [ "users" ], "readwrite"
         store = transaction.objectStore "users"
         request = store.add User

@@ -172,30 +172,47 @@
           return console.log("error adding node");
         };
       },
-      getUser: function(userName) {
-        var deferred, loadUserInfoFromIndexedDb;
+      getUser: function(userName, password) {
+        var deferred, loadUserInfoFromIndexedDb, openRequest;
         deferred = $q.defer();
-        loadUserInfoFromIndexedDb = function(def, userName) {
+        loadUserInfoFromIndexedDb = function(def) {
           var cursor, store, transaction, user;
-          transaction = db.transaction(["eurovelo_6"], "readonly");
+          transaction = db.transaction(["users"], "readonly");
           store = transaction.objectStore("users");
           cursor = store.openCursor();
-          user = {};
+          user = void 0;
           cursor.onsuccess = function(e) {
             var actUser;
             actUser = e.target.result;
-            if (actUser.value.userName === userName) {
-              user.id = actUser.key;
-              return user.userName = actUser.value.userName;
-            } else {
-              return actUser["continue"]();
+            if (actUser != null) {
+              if ((actUser.value != null) && actUser.value.userName === userName) {
+                return user = {
+                  id: actUser.key,
+                  userName: actUser.value.userName
+                };
+              } else {
+                return actUser["continue"]();
+              }
             }
           };
           return transaction.oncomplete = function(e) {
-            return def.resolve(route);
+            if (user) {
+              return def.resolve(user);
+            } else {
+              return def.reject("login error");
+            }
           };
         };
-        loadRouteInfoFromIndexedDb(deferred, userName);
+        if (db) {
+          loadUserInfoFromIndexedDb(deferred);
+        } else {
+          console.log("openRequest");
+          openRequest = openConnection();
+          openRequest.onsuccess = function(e) {
+            db = e.target.result;
+            return loadUserInfoFromIndexedDb(deferred);
+          };
+        }
         return deferred.promise;
       },
       addUser: function(User) {
@@ -203,7 +220,6 @@
         deferred = $q.defer();
         addUserToIndexedDb = function(def) {
           var request, store, transaction;
-          console.log("addUser");
           transaction = db.transaction(["users"], "readwrite");
           store = transaction.objectStore("users");
           request = store.add(User);

@@ -1,30 +1,130 @@
 angular.module 'services'
-.factory 'LoginService', ( $http, $q, $location ) ->
+.factory 'LoginService', ( $http, $q, $location, SecurityRetryQueue, $ionicPopup, $rootScope, $timeout ) ->
 
-  idbSupported = false
-  if "indexedDB" in window
-    idbSupported = true 
-  db = undefined
 
-  #todo check indexeddb is supported
-  openConnection = () ->
-    connRequest = indexedDB.open(
-      MapConstants.dbPrefix,
-      MapConstants.indexedDbVersion
-    )
+  $scope = $rootScope.$new() 
 
-    connRequest.onupgradeneeded = ( e ) ->
-      console.log "upgradeneedeed"
-      thisDB = e.target.result
+  #Todo implement observer instead of this
+  SecurityRetryQueue.onItemAddedCallbacks.push ( retryItem ) ->
+    if SecurityRetryQueue.hasMore()
+      console.log "retry lefut"
+      factoryObj.showLoginDialog()
 
-      if !thisDB.objectStoreNames.contains( "eurovelo_6" )
-        thisDB.createObjectStore "eurovelo_6", { autoIncrement: true }
 
-    connRequest.onerror = ( e ) ->
-      console.log "Error"
-      console.dir e
+  $scope.loginDialog = undefined
+  $scope.registrationDialog = undefined
 
-    connRequest
+  $scope.register = () ->
+    console.log "register"
+    if $scope.loginDialog != undefined
+      $scope.loginDialog.close()
+      $scope.loginDialog = undefined
+      #Todo potential bug, use returned promise to open registration dialog
+      $timeout $scope.openRegistrationDialog, 1
+  
+  $scope.login = () ->
+    if $scope.registrationDialog != undefined
+      $scope.registrationDialog.close()
+      $scope.registrationDialog = undefined
+      #Todo potential bug, use returned promise to open registration dialog
+      $timeout $scope.openLoginDialog, 1
+
+  $scope.openRegistrationDialog = () ->
+    $scope.data = {}
+
+    if $scope.registrationDialog
+      throw new Error 'Trying to open a dialog that is already open!'
+    $scope.registrationDialog = $ionicPopup.show
+      template: '''
+          <div class="list">
+            <label class="item item-input">
+              <input type="text" placeholder="Username" ng-model="data.userName">
+            </label>
+            <label class="item item-input">
+              <input type="email" placeholder="Email" ng-model="data.email">
+            </label>
+            <label class="item item-input">
+              <input type="password" placeholder="Password" ng-model="data.password">
+            </label>
+            <label class="item item-input">
+              <input type="password" placeholder="Repeat password" ng-model="data.passwordRepeat">
+            </label>
+            <a ng-click="login()">Already registered, take me to sign in</a>
+          </div>
+      ''',
+      title: 'Please sign up',
+      scope: $scope,
+      buttons: [
+        { 
+          text: 'Cancel',
+        },
+        {
+          text: '<b>Sign up</b>',
+          type: 'button-positive',
+          onTap: ( e ) ->
+            if $scope.data.password? && $scope.data.userName?
+              User = 
+                userName: $scope.data.userName,
+                password: $scope.data.password,
+                email: $scope.data.email
+              promise = factoryObj.signUp User
+              promise.then () ->
+                $scope.registrationDialog.close()
+                $scope.registrationDialog = undefined
+                $scope.retryAuthentication()
+              , () ->
+                console.log "regisztrációs hiba"
+            
+        } 
+      ]
+
+  $scope.openLoginDialog = () ->
+    $scope.data = {}
+
+    if $scope.loginDialog
+      throw new Error 'Trying to open a dialog that is already open!'
+    $scope.loginDialog = $ionicPopup.show
+      template: '''
+          <div class="list">
+            <label class="item item-input">
+              <input type="text" placeholder="Username" ng-model="data.userName">
+            </label>
+            <label class="item item-input">
+              <input type="password" placeholder="Password" ng-model="data.password">
+            </label>
+            <a ng-click="register()">Not registered, take me to sign up</a>
+          </div>
+      ''',
+      title: 'Please sign in',
+      scope: $scope,
+      buttons: [
+        { 
+          text: 'Cancel',
+        },
+        {
+          text: '<b>Save</b>',
+          type: 'button-positive',
+          onTap: ( e ) ->
+
+            e.preventDefault()
+
+            if $scope.data.password? && $scope.data.userName?
+              promise = factoryObj.login $scope.data.userName, $scope.data.password
+              promise.then () ->
+                $scope.loginDialog.close()
+                $scope.loginDialog = undefined
+                $scope.retryAuthentication()
+              , () ->
+                console.log "bejelentkezési hiba"
+        } 
+      ]
+
+    $scope.retryAuthentication = () ->
+      SecurityRetryQueue.retryAll()
+
+    $scope.cancelAuthentication = () ->
+      SecurityRetryQueue.cancelAll()
+      redirect()
 
   redirect = (url) ->
     url = url || '/';
@@ -63,29 +163,31 @@ angular.module 'services'
 
   factoryObj = 
     login: ( userName, password ) ->
+      handleResult = ( result ) ->
+        if typeof result.data.then == "function"  
+          result.data.then  ( data ) ->
+            sessionStorage.setItem "userName", data.userName
+            return data
+        else 
+          return data
+      return $http.post( 'login', { userName: userName, password: password } )
+        .then ( handleResult )
       deferred = $q.defer()
 
-      loadUserInfoFromIndexedDb = ( def, userName ) ->
-        transaction = db.transaction [ "eurovelo_6" ], "readonly"
-        store = transaction.objectStore "users"
-        cursor = store.openCursor()
+    signUp: ( User ) ->
+      handleResult = ( result ) ->
+        if typeof result.data.then == "function"  
+          result.data.then  ( data ) ->
+            sessionStorage.setItem "userName", data.userName
+            return data
+        else 
+          return data
+      return $http.post( 'signUp', User )
+        .then ( handleResult )
+      deferred = $q.defer()
 
-        user = {}
-
-        cursor.onsuccess = ( e ) ->
-          actUser = e.target.result
-          if actUser.value.userName == userName
-            user.id = actUser.key
-            user.userName = actUser.value.userName
-          else 
-            actUser.continue();
-
-        transaction.oncomplete = ( e ) ->
-          def.resolve route
-
-      loadRouteInfoFromIndexedDb( deferred, userName )
-
-      deferred.promise
+    showLoginDialog: () ->
+      $scope.openLoginDialog()
 
     addUser: ( User ) ->
       handleResult = ( result ) ->
@@ -107,7 +209,15 @@ angular.module 'services'
       return $http.delete("users", {id: User.id})
         .then ( handleResult )
 
-    getLoggedInUser: ->
-      return undefined
+    getSignedInUser: ->
+      userName = sessionStorage.getItem "userName"
 
+      defer = $q.defer();
+
+      if userName 
+        return userName
+      else 
+        promise = SecurityRetryQueue.pushRetryFn 'unauthorized-server', factoryObj.getSignedInUser
+        return promise
+ 
   factoryObj
