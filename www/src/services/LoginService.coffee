@@ -85,15 +85,17 @@ angular.module 'services'
       throw new Error 'Trying to open a dialog that is already open!'
     $scope.loginDialog = $ionicPopup.show
       template: '''
+        <form name="loginForm" novalidate>
           <div class="list">
             <label class="item item-input">
-              <input type="text" placeholder="Username" ng-model="data.userName">
+              <input type="text" placeholder="Username" ng-model="data.userName" required>
             </label>
             <label class="item item-input">
-              <input type="password" placeholder="Password" ng-model="data.password">
+              <input type="password" placeholder="Password" ng-model="data.password" required>
             </label>
             <a ng-click="register()">Not registered, take me to sign up</a>
           </div>
+        </form>
       ''',
       title: 'Please sign in',
       scope: $scope,
@@ -107,7 +109,7 @@ angular.module 'services'
           onTap: ( e ) ->
 
             e.preventDefault()
-
+            form = $scope.loginForm
             if $scope.data.password? && $scope.data.userName?
               promise = factoryObj.login $scope.data.userName, $scope.data.password
               promise.then () ->
@@ -129,37 +131,6 @@ angular.module 'services'
   redirect = (url) ->
     url = url || '/';
     $location.path url
-
-  # // Login form dialog stuff
-  # var loginDialog = null;
-  # function openLoginDialog() {
-  #   if ( loginDialog ) {
-  #     throw new Error('Trying to open a dialog that is already open!');
-  #   }
-  #   loginDialog = $dialog.dialog();
-  #   loginDialog.open('security/login/form.tpl.html', 'LoginFormController').then(onLoginDialogClose);
-  # }
-  # function closeLoginDialog(success) {
-  #   if (loginDialog) {
-  #     loginDialog.close(success);
-  #   }
-  # }
-  # function onLoginDialogClose(success) {
-  #   loginDialog = null;
-  #   if ( success ) {
-  #     queue.retryAll();
-  #   } else {
-  #     queue.cancelAll();
-  #     redirect();
-  #   }
-  # }
-
-  # // Register a handler for when an item is added to the retry queue
-  # queue.onItemAddedCallbacks.push(function(retryItem) {
-  #   if ( queue.hasMore() ) {
-  #     service.showLogin();
-  #   }
-  # });
 
   factoryObj = 
     login: ( userName, password ) ->
@@ -219,5 +190,20 @@ angular.module 'services'
       else 
         promise = SecurityRetryQueue.pushRetryFn 'unauthorized-server', factoryObj.getSignedInUser
         return promise
+
+    changePassword: ( userName, oldPassword, newPassword ) ->
+      handleResult = ( result ) ->
+        if typeof result.data.then == "function"  
+          result.data.then  ( data ) ->
+            return data
+        else 
+          return data
+
+      requestData =
+        userName: userName,
+        oldPassword: oldPassword,
+        newPassword: newPassword
+      return $http.put( "changePassword", requestData )
+        .then ( handleResult )
  
   factoryObj

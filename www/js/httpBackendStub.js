@@ -23,6 +23,19 @@
       promise = LocalDataProviderService.addUser(obj);
       return [200, promise, {}];
     });
+    $httpBackend.whenGET(/users\/.*/).respond(function(method, url, data) {
+      var promise, userName, userNameIndex;
+      userNameIndex = url.lastIndexOf("/");
+      userName = url.substring(userNameIndex + 1);
+      promise = LocalDataProviderService.getUser(userName);
+      return [200, promise, {}];
+    });
+    $httpBackend.whenPUT('changePassword').respond(function(method, url, data) {
+      var obj, promise;
+      obj = angular.fromJson(data);
+      promise = LocalDataProviderService.updateUser(obj.userName, obj);
+      return [200, "", {}];
+    });
     return $httpBackend.whenGET(/templates\/.*/).passThrough();
   });
 

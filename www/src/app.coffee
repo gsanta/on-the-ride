@@ -1,4 +1,4 @@
-angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
+angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes', 'directives' ]
 .run ( $ionicPlatform, $rootScope, $location, LoginService ) ->
 
   $ionicPlatform.ready ->
@@ -38,15 +38,17 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes' ]
     },
     resolve: {
       auth: ( $q, $injector, LoginService ) ->
-        # userName = LoginService.getSignedInUser()
-        # $q.when( userName )
-        # .then(
-        #   () ->
-        #     console.log "resolved"
-        #   ,() ->
-        #     console.log "not resolved"
-        # )
         return LoginService.getSignedInUser()
+    }
+  }
+
+  .state 'tab.profile', {
+    url: '/profile',
+    views: {
+      'tab-profile': {
+        templateUrl: 'templates/profile.html',
+        controller: 'ProfileCtrl'
+      }
     }
   }
 

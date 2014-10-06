@@ -1,0 +1,82 @@
+<ion-view id="tab-profile" title="Profile" ng-controller="ProfileCtrl">
+  <ion-content class="has-header padding">
+    <div class="card">
+	  <div class="item item-divider">
+	    About
+	  </div>
+	  <div class="item item-text-wrap">
+	  	Username:
+	  	<div class="list list-inset">
+		  <label class="item item-input">
+		    <input type="text" ng-model="user.userName" disabled>
+		  </label>
+		</div>
+		Email:
+		<div class="list list-inset">
+		  <label class="item item-input">
+		    <input type="email" ng-model="user.email">
+		  </label>
+		</div>
+	  </div>
+	</div>
+
+	<div class="card">
+	  <div class="item item-divider">
+	    Change password
+	  </div>
+	  <div class="item item-text-wrap">
+	  	<form name="passwordChangeForm" novalidate>
+		  	Current password:
+		  	<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.currentPassword)">
+			  	<label class="item item-input">
+			    	<input type="password" ng-model="user.password" name="currentPassword" ng-class="getCssClasses(passwordChangeForm.currentPassword)" required>
+			  	</label>
+			</div>
+		  	<ul class="validation-error-list">
+		    	<li>
+		    		<span ng-show="passwordChangeForm.currentPassword.$dirty && showError(passwordChangeForm.currentPassword, 'required')">
+						This field is required!
+					</span>
+				</li>
+			</ul>
+
+
+			New password:
+			<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.newPassword)">
+			  <label class="item item-input">
+			    <input type="password" ng-model="newPassword" name="newPassword" required>
+			  </label>
+			</div>
+		  	<ul class="validation-error-list">
+		    	<li>
+		    		<span ng-show="passwordChangeForm.newPassword.$dirty && showError(passwordChangeForm.newPassword, 'required')">
+						This field is required!
+					</span>
+				</li>
+			</ul>
+
+			Repeat new password:
+			<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.confirmPassword)">
+			  <label class="item item-input">
+			    <input type="password" data-match="newPassword" ng-model="confirmPassword" name="confirmPassword" ng-class="getCssClasses(passwordChangeForm.confirmPassword)" required>
+			  </label>
+			</div>	
+			<ul class="validation-error-list">
+		  		<li>
+		    		<span ng-show="passwordChangeForm.confirmPassword.$error.match">	
+		    			Passwords do not match!
+		    		</span>
+		    	</li>
+		    	<li>
+		    		<span ng-show="passwordChangeForm.confirmPassword.$dirty && showError(passwordChangeForm.confirmPassword, 'required')">
+						This field is required!
+					</span>
+				</li>
+			</ul>
+
+			<button ng-disabled="!canSaveForm(passwordChangeForm)" ng-click="submitPasswordChangeForm(passwordChangeForm)" class="button-positive">Submit</button>
+		</form>
+	  </div>
+	</div>
+  </ion-content>
+</ion-view>

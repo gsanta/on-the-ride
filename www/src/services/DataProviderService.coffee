@@ -1,5 +1,5 @@
 angular.module 'services'
-.factory 'DataProvider', ( $http ) ->
+.factory 'DataProvider', ( $http, $q ) ->
   
   factoryObj =
   
@@ -15,5 +15,18 @@ angular.module 'services'
 
     savePlaceInfo: ( data ) ->
       $http.post '/info', data
+
+    getUserInfo: ( userName ) ->
+      deferred = $q.defer()
+
+      $http.get "/users/#{userName}"
+      .then ( resp ) ->
+        if resp.data.then? 
+          resp.data.then ( resp2 ) ->
+            deferred.resolve( resp2 )
+
+      deferred.promise
+
+
 
   factoryObj

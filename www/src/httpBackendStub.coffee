@@ -30,25 +30,24 @@ angular.module 'starter'
 
   	return [200,  promise, {}];
   )
-  # respond.savedRespond = respond.respond
-  # respond.respond = ( ) ->
-  # 	console.log "a respond-bol"
-  # 	console.log { valami: "valami"}
-  # 	console.log respond.savedRespond( {valami: "valami"} )
 
-  	#promise = LocalDataProviderService.addUser( )
-
-  # $httpBackend.whenGET("templates/mapEdit.html")
-  # .respond( ( method, url, data ) ->
-  # 	that = arguments
+  $httpBackend.whenGET( /users\/.*/ )
+  .respond( ( method, url, data ) ->
   	
-  # 	user = LoginService.getSignedInUser()
-  # 	console.log user
-  # 	if user 
-  # 		$delegate(method, url, data, callback, headers, timeout, withCredentials);
-  # 		#return [ method, url, data ];
-  # 	else
-  # 		return [401,  "", {}];
-  # )
+  	userNameIndex = url.lastIndexOf "/"
+  	userName = url.substring userNameIndex + 1
 
-  $httpBackend.whenGET(/templates\/.*/).passThrough()
+  	promise = LocalDataProviderService.getUser userName 
+  	return [200,  promise, {}];
+  )
+
+  $httpBackend.whenPUT( 'changePassword' )
+  .respond( ( method, url, data ) ->
+  	
+  	obj = angular.fromJson data
+  	promise = LocalDataProviderService.updateUser obj.userName, obj
+
+  	return [200,  "", {}];
+  )
+
+  $httpBackend.whenGET( /templates\/.*/ ).passThrough()

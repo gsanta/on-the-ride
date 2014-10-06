@@ -8,6 +8,11 @@
 	border: 1px solid green;
 }
 
+.validation-error-list > li > span {
+    color: red;
+    font-size: 0.8em;
+}
+
 .google-maps-wrapper {
 	position: relative;
     padding-bottom: 75%; // This is the aspect ratio
@@ -22,3 +27,7 @@
     width: 100% !important;
     height: 100% !important;
 }
+
+/********************************/
+/*Profile*/
+

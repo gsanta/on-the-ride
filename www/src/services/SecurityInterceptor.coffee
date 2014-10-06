@@ -3,7 +3,9 @@ angular.module 'services'
 # This http interceptor listens for authentication failures
 .factory 'securityInterceptor', ( $injector, SecurityRetryQueue ) ->
   return ( promise ) ->
-    return promise.then null, ( originalResponse ) ->
+    return promise.then (originalResponse) ->
+    	return originalResponse
+    , ( originalResponse ) ->
       console.log "login error"
       console.log originalResponse.status
       if originalResponse.status == 401

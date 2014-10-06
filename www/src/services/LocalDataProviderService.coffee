@@ -177,9 +177,8 @@ angular.module 'services'
           actUser = e.target.result
           if actUser?
             if actUser.value? && actUser.value.userName == userName
-              user = 
-                id: actUser.key
-                userName: actUser.value.userName
+              user = actUser.value
+              user.id = actUser.key
             else 
               actUser.continue();
 
@@ -224,6 +223,25 @@ angular.module 'services'
           db = e.target.result
           addUserToIndexedDb( deferred )
       
+      deferred.promise
+
+    updateUser: ( userName, updateObj ) ->
+      deferred = $q.defer()
+
+      promise = this.getUser userName, undefined
+
+      promise.then ( data ) ->
+        for k,v of data
+          if updateObj[ k ]?
+            data[ k ] = updateObj[ k ]
+
+        transaction = db.transaction [ "users" ], "readwrite"
+        store = transaction.objectStore "users"
+        request = store.put data, data.id
+
+        request.onsuccess = ( e ) ->
+          deferred.resolve data
+
       deferred.promise
 
     removeUser: ( User ) ->

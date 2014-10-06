@@ -186,10 +186,8 @@
             actUser = e.target.result;
             if (actUser != null) {
               if ((actUser.value != null) && actUser.value.userName === userName) {
-                return user = {
-                  id: actUser.key,
-                  userName: actUser.value.userName
-                };
+                user = actUser.value;
+                return user.id = actUser.key;
               } else {
                 return actUser["continue"]();
               }
@@ -240,6 +238,27 @@
             return addUserToIndexedDb(deferred);
           };
         }
+        return deferred.promise;
+      },
+      updateUser: function(userName, updateObj) {
+        var deferred, promise;
+        deferred = $q.defer();
+        promise = this.getUser(userName, void 0);
+        promise.then(function(data) {
+          var k, request, store, transaction, v;
+          for (k in data) {
+            v = data[k];
+            if (updateObj[k] != null) {
+              data[k] = updateObj[k];
+            }
+          }
+          transaction = db.transaction(["users"], "readwrite");
+          store = transaction.objectStore("users");
+          request = store.put(data, data.id);
+          return request.onsuccess = function(e) {
+            return deferred.resolve(data);
+          };
+        });
         return deferred.promise;
       },
       removeUser: function(User) {

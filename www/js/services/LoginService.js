@@ -69,7 +69,7 @@
         throw new Error('Trying to open a dialog that is already open!');
       }
       $scope.loginDialog = $ionicPopup.show({
-        template: '<div class="list">\n  <label class="item item-input">\n    <input type="text" placeholder="Username" ng-model="data.userName">\n  </label>\n  <label class="item item-input">\n    <input type="password" placeholder="Password" ng-model="data.password">\n  </label>\n  <a ng-click="register()">Not registered, take me to sign up</a>\n</div>',
+        template: '<form name="loginForm" novalidate>\n  <div class="list">\n    <label class="item item-input">\n      <input type="text" placeholder="Username" ng-model="data.userName" required>\n    </label>\n    <label class="item item-input">\n      <input type="password" placeholder="Password" ng-model="data.password" required>\n    </label>\n    <a ng-click="register()">Not registered, take me to sign up</a>\n  </div>\n</form>',
         title: 'Please sign in',
         scope: $scope,
         buttons: [
@@ -79,8 +79,9 @@
             text: '<b>Save</b>',
             type: 'button-positive',
             onTap: function(e) {
-              var promise;
+              var form, promise;
               e.preventDefault();
+              form = $scope.loginForm;
               if (($scope.data.password != null) && ($scope.data.userName != null)) {
                 promise = factoryObj.login($scope.data.userName, $scope.data.password);
                 return promise.then(function() {
@@ -182,6 +183,24 @@
           promise = SecurityRetryQueue.pushRetryFn('unauthorized-server', factoryObj.getSignedInUser);
           return promise;
         }
+      },
+      changePassword: function(userName, oldPassword, newPassword) {
+        var handleResult, requestData;
+        handleResult = function(result) {
+          if (typeof result.data.then === "function") {
+            return result.data.then(function(data) {
+              return data;
+            });
+          } else {
+            return data;
+          }
+        };
+        requestData = {
+          userName: userName,
+          oldPassword: oldPassword,
+          newPassword: newPassword
+        };
+        return $http.put("changePassword", requestData).then(handleResult);
       }
     };
     return factoryObj;

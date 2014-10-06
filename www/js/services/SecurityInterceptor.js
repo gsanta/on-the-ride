@@ -2,7 +2,9 @@
 (function() {
   angular.module('services').factory('securityInterceptor', function($injector, SecurityRetryQueue) {
     return function(promise) {
-      return promise.then(null, function(originalResponse) {
+      return promise.then(function(originalResponse) {
+        return originalResponse;
+      }, function(originalResponse) {
         console.log("login error");
         console.log(originalResponse.status);
         if (originalResponse.status === 401) {
