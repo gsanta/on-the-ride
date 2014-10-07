@@ -1,5 +1,5 @@
 angular.module "controllers"
-.controller 'ProfileCtrl', ( $scope, DataProvider, LoginService, UserService ) ->
+.controller 'ProfileCtrl', ( $scope, DataProvider, LoginService, UserService, flash ) ->
   
   promise = DataProvider.getUserInfo( "gsanta" )
   promise.then ( data ) ->
@@ -46,6 +46,8 @@ angular.module "controllers"
     promise.then ( User ) ->
       $scope.user = User
       form.$setPristine()
+
+      flash( 'Saved!' )
 
 
   

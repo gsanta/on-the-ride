@@ -1,1 +1,1 @@
-angular.module "controllers", [ "services", "directives" ]
+angular.module "controllers", [ "services", "directives", "flash" ]

@@ -1,5 +1,6 @@
 <ion-view id="tab-profile" title="Profile" ng-controller="ProfileCtrl">
   <ion-content class="has-header padding">
+  	<flash:messages class="slide-down" ng:show="messages"></flash:messages>
     <div class="card">
 	  <div class="item item-divider">
 	    About
@@ -25,6 +26,7 @@
 		    		</span>
 		    	</li>
 			</ul>
+			<img gravatar-src="'santagergely90@gmail.com'" gravatar-size="100">
 			<button ng-disabled="!canSaveForm(profileForm)" ng-click="submitProfileForm(profileForm)" class="button-positive">Submit</button>
 		</form>
 	  </div>

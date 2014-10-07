@@ -1,4 +1,4 @@
-angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes', 'directives' ]
+angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes', 'directives', 'ui.gravatar' ]
 .run ( $ionicPlatform, $rootScope, $location, LoginService ) ->
 
   $ionicPlatform.ready ->

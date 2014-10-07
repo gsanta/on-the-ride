@@ -9,9 +9,14 @@
     "angular-mocks": "~1.2.20",
     "angular-ui-router": "*",
     "angular-cookies": "~1.2.20",
-    "ionic": "~1.0.0"
+    "ionic": "~1.0.0",
+    "angular-flash-messages": "~1.1.0",
+    "angular-gravatar": "~0.2.1"
   },
   "devDependencies": {
     "riggr": "~0.9.7"
+  },
+  "resolutions": {
+    "angular": "1.2.25"
   }
 }
