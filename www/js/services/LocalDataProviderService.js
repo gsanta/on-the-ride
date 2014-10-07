@@ -187,7 +187,8 @@
             if (actUser != null) {
               if ((actUser.value != null) && actUser.value.userName === userName) {
                 user = actUser.value;
-                return user.id = actUser.key;
+                user.id = actUser.key;
+                return user.password = "";
               } else {
                 return actUser["continue"]();
               }

@@ -5,18 +5,28 @@
 	    About
 	  </div>
 	  <div class="item item-text-wrap">
-	  	Username:
-	  	<div class="list list-inset">
-		  <label class="item item-input">
-		    <input type="text" ng-model="user.userName" disabled>
-		  </label>
-		</div>
-		Email:
-		<div class="list list-inset">
-		  <label class="item item-input">
-		    <input type="email" ng-model="user.email">
-		  </label>
-		</div>
+	  	<form name="profileForm" novalidate>
+		  	Username:
+		  	<div class="list list-inset">
+			  <label class="item item-input">
+			    <input type="text" ng-model="user.userName" disabled>
+			  </label>
+			</div>
+			Email:
+			<div class="list list-inset">
+			  <label class="item item-input">
+			    <input type="email" ng-model="user.email" name="email">
+			  </label>
+			</div>
+			<ul class="validation-error-list">
+		  		<li>
+		    		<span ng-show="profileForm.email.$error.email">	
+		    			Give a correct email!
+		    		</span>
+		    	</li>
+			</ul>
+			<button ng-disabled="!canSaveForm(profileForm)" ng-click="submitProfileForm(profileForm)" class="button-positive">Submit</button>
+		</form>
 	  </div>
 	</div>
 
@@ -29,7 +39,7 @@
 		  	Current password:
 		  	<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.currentPassword)">
 			  	<label class="item item-input">
-			    	<input type="password" ng-model="user.password" name="currentPassword" ng-class="getCssClasses(passwordChangeForm.currentPassword)" required>
+			    	<input type="password" ng-model="passwordChange.currentPassword" name="currentPassword" ng-class="getCssClasses(passwordChangeForm.currentPassword)" required>
 			  	</label>
 			</div>
 		  	<ul class="validation-error-list">
@@ -44,7 +54,7 @@
 			New password:
 			<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.newPassword)">
 			  <label class="item item-input">
-			    <input type="password" ng-model="newPassword" name="newPassword" required>
+			    <input type="password" ng-model="passwordChange.newPassword" name="newPassword" required>
 			  </label>
 			</div>
 		  	<ul class="validation-error-list">
@@ -58,7 +68,7 @@
 			Repeat new password:
 			<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.confirmPassword)">
 			  <label class="item item-input">
-			    <input type="password" data-match="newPassword" ng-model="confirmPassword" name="confirmPassword" ng-class="getCssClasses(passwordChangeForm.confirmPassword)" required>
+			    <input type="password" data-match="passwordChange.newPassword" ng-model="passwordChange.confirmPassword" name="confirmPassword" ng-class="getCssClasses(passwordChangeForm.confirmPassword)" required>
 			  </label>
 			</div>	
 			<ul class="validation-error-list">

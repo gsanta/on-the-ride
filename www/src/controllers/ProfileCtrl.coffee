@@ -1,5 +1,5 @@
 angular.module "controllers"
-.controller 'ProfileCtrl', ( $scope, DataProvider, LoginService ) ->
+.controller 'ProfileCtrl', ( $scope, DataProvider, LoginService, UserService ) ->
   
   promise = DataProvider.getUserInfo( "gsanta" )
   promise.then ( data ) ->
@@ -8,6 +8,10 @@ angular.module "controllers"
   $scope.user = {}
 
   $scope.newPassword = undefined
+
+  $scope.passwordChange = {
+
+  }
 
   $scope.getCssClasses = ( ngModelContoller ) ->
     return {
@@ -27,8 +31,21 @@ angular.module "controllers"
   	if form.$dirty && form.$invalid
     	return
 
-    LoginService.changePassword $scope.user.userName, $scope.user.password, form.newPassword.$modelValue
+    promise = LoginService.changePassword $scope.user.userName, $scope.passwordChange.password, $scope.passwordChange.newPassword
 
+    promise.then () ->
+      $scope.passwordChange = {}
+      form.$setPristine()
+
+  $scope.submitProfileForm = ( form ) ->
+    if form.$dirty && form.$invalid
+      return
+
+    promise = UserService.changeProfileData $scope.user.userName, $scope.user
+
+    promise.then ( User ) ->
+      $scope.user = User
+      form.$setPristine()
 
 
   

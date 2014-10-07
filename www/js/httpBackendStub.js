@@ -30,11 +30,22 @@
       promise = LocalDataProviderService.getUser(userName);
       return [200, promise, {}];
     });
-    $httpBackend.whenPUT('changePassword').respond(function(method, url, data) {
-      var obj, promise;
+    $httpBackend.whenPUT(/users\/.*/).respond(function(method, url, data) {
+      var obj, promise, userName, userNameIndex;
+      userNameIndex = url.lastIndexOf("/");
+      userName = url.substring(userNameIndex + 1);
       obj = angular.fromJson(data);
-      promise = LocalDataProviderService.updateUser(obj.userName, obj);
-      return [200, "", {}];
+      promise = LocalDataProviderService.updateUser(userName, obj);
+      return [200, promise, {}];
+    });
+    $httpBackend.whenPUT('changePassword').respond(function(method, url, data) {
+      var newObj, obj, promise;
+      obj = angular.fromJson(data);
+      newObj = {
+        password: obj.newPassword
+      };
+      promise = LocalDataProviderService.updateUser(obj.userName, newObj);
+      return [200, promise, {}];
     });
     return $httpBackend.whenGET(/templates\/.*/).passThrough();
   });

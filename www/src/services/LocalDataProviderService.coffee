@@ -179,6 +179,7 @@ angular.module 'services'
             if actUser.value? && actUser.value.userName == userName
               user = actUser.value
               user.id = actUser.key
+              user.password = ""
             else 
               actUser.continue();
 
