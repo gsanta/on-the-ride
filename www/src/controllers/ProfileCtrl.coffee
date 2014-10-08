@@ -1,5 +1,5 @@
 angular.module "controllers"
-.controller 'ProfileCtrl', ( $scope, DataProvider, LoginService, UserService, flash ) ->
+.controller 'ProfileCtrl', ( $scope, DataProvider, LoginService, UserService ) ->
   
   promise = DataProvider.getUserInfo( "gsanta" )
   promise.then ( data ) ->
@@ -36,6 +36,7 @@ angular.module "controllers"
     promise.then () ->
       $scope.passwordChange = {}
       form.$setPristine()
+      $scope.passwordFlashMessage = "changes saved"
 
   $scope.submitProfileForm = ( form ) ->
     if form.$dirty && form.$invalid
@@ -46,8 +47,8 @@ angular.module "controllers"
     promise.then ( User ) ->
       $scope.user = User
       form.$setPristine()
+      $scope.profileFlashMessage = "changes saved"
 
-      flash( 'Saved!' )
 
 
   

@@ -1,6 +1,6 @@
 <ion-view id="tab-profile" title="Profile" ng-controller="ProfileCtrl">
   <ion-content class="has-header padding">
-  	<flash:messages class="slide-down" ng:show="messages"></flash:messages>
+
     <div class="card">
 	  <div class="item item-divider">
 	    About
@@ -28,6 +28,7 @@
 			</ul>
 			<img gravatar-src="'santagergely90@gmail.com'" gravatar-size="100">
 			<button ng-disabled="!canSaveForm(profileForm)" ng-click="submitProfileForm(profileForm)" class="button-positive">Submit</button>
+			<flash content="{{profileFlashMessage}}" class="flash-message"></flash>
 		</form>
 	  </div>
 	</div>
@@ -85,8 +86,9 @@
 					</span>
 				</li>
 			</ul>
-
+			<flash content="{{passwordFlashMessage}}" class="flash-message"></flash>
 			<button ng-disabled="!canSaveForm(passwordChangeForm)" ng-click="submitPasswordChangeForm(passwordChangeForm)" class="button-positive">Submit</button>
+
 		</form>
 	  </div>
 	</div>
