@@ -72,7 +72,7 @@
         var centerCoordinates, circle, circles, index, _i, _len, _results;
         $scope.routeInfo = data;
         centerCoordinates = Map.createCoordinate(data[0].lat, data[0].lon);
-        $scope.map = new google.maps.Map(document.querySelector('#view-map-edit').querySelector('#googleMap'), Map.createMapProperties(centerCoordinates, 3));
+        $scope.map = new google.maps.Map(document.querySelector('#container-map-edit').querySelector('#googleMap'), Map.createMapProperties(centerCoordinates, 3));
         circles = Map.createPointsFromRoute(data, $scope.map);
         _results = [];
         for (index = _i = 0, _len = circles.length; _i < _len; index = ++_i) {

@@ -4,7 +4,6 @@
 
   angular.module('services').factory('LocalDataProviderService', function($http, $q, MapConstants) {
     var db, factoryObj, idbSupported, openConnection, shouldPopulateDb;
-    console.log("lefut");
     idbSupported = false;
     if (__indexOf.call(window, "indexedDB") >= 0) {
       idbSupported = true;

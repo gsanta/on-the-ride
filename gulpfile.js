@@ -10,12 +10,13 @@ var jasmine = require('gulp-jasmine');
 var coffee = require('gulp-coffee');
 var karma = require('karma').server;
 var coffeelint = require("gulp-coffeelint");
+var connect = require('gulp-connect');
 
 var paths = {
   sass: ['./scss/**/*.scss']
 };
 
-gulp.task('default', ['sass']);
+gulp.task('default', ['connect']);
 
 gulp.task('sass', function(done) {
   gulp.src('./scss/ionic.app.scss')
@@ -77,4 +78,11 @@ gulp.task('coffeeLint', function () {
     gulp.src('www/src/**/*.coffee')
     .pipe(coffeelint())
     .pipe(coffeelint.reporter());
+});
+
+gulp.task('connect', function() {
+  connect.server({
+    port: 8001,
+    livereload: true
+  });
 });

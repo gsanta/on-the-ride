@@ -10,45 +10,21 @@
       }
     });
   }).config(function($stateProvider, $urlRouterProvider) {
-    $stateProvider.state('tab', {
-      url: "/tab",
-      abstract: true,
-      templateUrl: "templates/tabs.html"
-    }).state('tab.map', {
-      url: '/map',
-      views: {
-        'tab-map': {
-          templateUrl: 'templates/map.html',
-          controller: 'MapCtrl'
-        }
-      }
-    }).state('tab.mapEdit', {
-      url: '/mapEdit',
-      views: {
-        'tab-map-edit': {
-          templateUrl: 'templates/mapEdit.html',
-          controller: 'MapEditCtrl'
-        }
-      },
+    $stateProvider.state('map', {
+      url: "/map",
+      templateUrl: 'templates/mapEdit.html',
+      controller: 'MapEditCtrl'
+    }).state('profile', {
+      url: "/profile",
+      templateUrl: 'templates/profile.html',
+      controller: 'ProfileCtrl',
       resolve: {
         auth: function($q, $injector, LoginService) {
           return LoginService.getSignedInUser();
         }
       }
-    }).state('tab.profile', {
-      url: '/profile',
-      views: {
-        'tab-profile': {
-          templateUrl: 'templates/profile.html',
-          controller: 'ProfileCtrl'
-        }
-      }
-    }).state('login', {
-      url: '/login',
-      templateUrl: 'templates/login.html',
-      controller: 'LoginCtrl'
     });
-    return $urlRouterProvider.otherwise('/tab/mapEdit');
+    return $urlRouterProvider.otherwise('/map');
   });
 
 }).call(this);

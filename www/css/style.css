@@ -50,6 +50,16 @@
     border-radius: 5px;
 }
 
+.energized {
+  background-color: #f0b840;
+  border: 1px solid #f0b840;
+}
+
+.app-item-active > .item-content {
+  background-color: #f0b840;
+  border: 1px solid #f0b840;
+}
+
 
 /********************************/
 /*Profile*/

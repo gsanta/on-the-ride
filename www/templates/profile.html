@@ -1,96 +1,117 @@
-<ion-view id="tab-profile" title="Profile" ng-controller="ProfileCtrl">
-  <ion-content class="has-header padding">
-
-    <div class="card">
-	  <div class="item item-divider">
-	    About
-	  </div>
-	  <div class="item item-text-wrap">
-	  	<form name="profileForm" novalidate>
-		  	Username:
-		  	<div class="list list-inset">
-			  <label class="item item-input">
-			    <input type="text" ng-model="user.userName" disabled>
-			  </label>
-			</div>
-			Email:
-			<div class="list list-inset">
-			  <label class="item item-input">
-			    <input type="email" ng-model="user.email" name="email">
-			  </label>
-			</div>
-			<ul class="validation-error-list">
-		  		<li>
-		    		<span ng-show="profileForm.email.$error.email">	
-		    			Give a correct email!
-		    		</span>
-		    	</li>
-			</ul>
-			<img gravatar-src="'santagergely90@gmail.com'" gravatar-size="100">
-			<button ng-disabled="!canSaveForm(profileForm)" ng-click="submitProfileForm(profileForm)" class="button-positive">Submit</button>
-			<flash content="{{profileFlashMessage}}" class="flash-message"></flash>
-		</form>
-	  </div>
-	</div>
-
-	<div class="card">
-	  <div class="item item-divider">
-	    Change password
-	  </div>
-	  <div class="item item-text-wrap">
-	  	<form name="passwordChangeForm" novalidate>
-		  	Current password:
-		  	<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.currentPassword)">
-			  	<label class="item item-input">
-			    	<input type="password" ng-model="passwordChange.currentPassword" name="currentPassword" ng-class="getCssClasses(passwordChangeForm.currentPassword)" required>
-			  	</label>
-			</div>
-		  	<ul class="validation-error-list">
-		    	<li>
-		    		<span ng-show="passwordChangeForm.currentPassword.$dirty && showError(passwordChangeForm.currentPassword, 'required')">
-						This field is required!
-					</span>
-				</li>
-			</ul>
-
-
-			New password:
-			<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.newPassword)">
-			  <label class="item item-input">
-			    <input type="password" ng-model="passwordChange.newPassword" name="newPassword" required>
-			  </label>
-			</div>
-		  	<ul class="validation-error-list">
-		    	<li>
-		    		<span ng-show="passwordChangeForm.newPassword.$dirty && showError(passwordChangeForm.newPassword, 'required')">
-						This field is required!
-					</span>
-				</li>
-			</ul>
-
-			Repeat new password:
-			<div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.confirmPassword)">
-			  <label class="item item-input">
-			    <input type="password" data-match="passwordChange.newPassword" ng-model="passwordChange.confirmPassword" name="confirmPassword" ng-class="getCssClasses(passwordChangeForm.confirmPassword)" required>
-			  </label>
-			</div>	
-			<ul class="validation-error-list">
-		  		<li>
-		    		<span ng-show="passwordChangeForm.confirmPassword.$error.match">	
-		    			Passwords do not match!
-		    		</span>
-		    	</li>
-		    	<li>
-		    		<span ng-show="passwordChangeForm.confirmPassword.$dirty && showError(passwordChangeForm.confirmPassword, 'required')">
-						This field is required!
-					</span>
-				</li>
-			</ul>
-			<flash content="{{passwordFlashMessage}}" class="flash-message"></flash>
-			<button ng-disabled="!canSaveForm(passwordChangeForm)" ng-click="submitPasswordChangeForm(passwordChangeForm)" class="button-positive">Submit</button>
-
-		</form>
-	  </div>
-	</div>
-  </ion-content>
-</ion-view>
+<ion-side-menus ng-controller="ProfileCtrl">
+  <ion-side-menu-content>
+    <ion-header-bar class="bar-energized">
+      <button class="button button-icon icon ion-navicon-round"
+        menu-toggle="left"
+        ></button>
+      <h1 class="title">Profile</h1>
+    </ion-header-bar>
+    <ion-content  ng-init="initMap()" id="container-map-edit">
+      <div class="card">
+        <div class="item item-divider">
+          About
+        </div>
+        <div class="item item-text-wrap">
+          <form name="profileForm" novalidate>
+            Username:
+            <div class="list list-inset">
+              <label class="item item-input">
+              <input type="text" ng-model="user.userName" disabled>
+              </label>
+            </div>
+            Email:
+            <div class="list list-inset">
+              <label class="item item-input">
+              <input type="email" ng-model="user.email" name="email">
+              </label>
+            </div>
+            <ul class="validation-error-list">
+              <li>
+                <span ng-show="profileForm.email.$error.email">	
+                Give a correct email!
+                </span>
+              </li>
+            </ul>
+            <img gravatar-src="'santagergely90@gmail.com'" gravatar-size="100">
+            <button ng-disabled="!canSaveForm(profileForm)" ng-click="submitProfileForm(profileForm)" class="button-positive">Submit</button>
+            <flash content="{{profileFlashMessage}}" class="flash-message"></flash>
+          </form>
+        </div>
+      </div>
+      <div class="card">
+        <div class="item item-divider">
+          Change password
+        </div>
+        <div class="item item-text-wrap">
+          <form name="passwordChangeForm" novalidate>
+            Current password:
+            <div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.currentPassword)">
+              <label class="item item-input">
+              <input type="password" ng-model="passwordChange.currentPassword" name="currentPassword" ng-class="getCssClasses(passwordChangeForm.currentPassword)" required>
+              </label>
+            </div>
+            <ul class="validation-error-list">
+              <li>
+                <span ng-show="passwordChangeForm.currentPassword.$dirty && showError(passwordChangeForm.currentPassword, 'required')">
+                This field is required!
+                </span>
+              </li>
+            </ul>
+            New password:
+            <div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.newPassword)">
+              <label class="item item-input">
+              <input type="password" ng-model="passwordChange.newPassword" name="newPassword" required>
+              </label>
+            </div>
+            <ul class="validation-error-list">
+              <li>
+                <span ng-show="passwordChangeForm.newPassword.$dirty && showError(passwordChangeForm.newPassword, 'required')">
+                This field is required!
+                </span>
+              </li>
+            </ul>
+            Repeat new password:
+            <div class="list list-inset" ng-class="getCssClasses(passwordChangeForm.confirmPassword)">
+              <label class="item item-input">
+              <input type="password" data-match="passwordChange.newPassword" ng-model="passwordChange.confirmPassword" name="confirmPassword" ng-class="getCssClasses(passwordChangeForm.confirmPassword)" required>
+              </label>
+            </div>
+            <ul class="validation-error-list">
+              <li>
+                <span ng-show="passwordChangeForm.confirmPassword.$error.match">	
+                Passwords do not match!
+                </span>
+              </li>
+              <li>
+                <span ng-show="passwordChangeForm.confirmPassword.$dirty && showError(passwordChangeForm.confirmPassword, 'required')">
+                This field is required!
+                </span>
+              </li>
+            </ul>
+            <flash content="{{passwordFlashMessage}}" class="flash-message"></flash>
+            <button ng-disabled="!canSaveForm(passwordChangeForm)" ng-click="submitPasswordChangeForm(passwordChangeForm)" class="button-positive">Submit</button>
+          </form>
+        </div>
+      </div>
+    </ion-content>
+  </ion-side-menu-content>
+  <ion-side-menu side="left">
+    <ion-list>
+      <ion-item nav-clear menu-close href="#/map">
+        Map
+      </ion-item>
+      <ion-item nav-clear menu-close href="#/profile" class="app-item-active">
+        Profile
+      </ion-item>
+      <ion-item ng-click="security.login()" ng-hide="security.isLoggedIn()">
+        Log in
+      </ion-item>
+      <ion-item ng-click="security.signUp()" ng-hide="security.isLoggedIn()">
+        Sign up
+      </ion-item>
+      <ion-item ng-click="security.logout()" ng-show="security.isLoggedIn()">
+        Log out
+      </ion-item>
+    </ion-list>
+  </ion-side-menu>
+</ion-side-menus>

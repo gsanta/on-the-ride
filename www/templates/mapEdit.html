@@ -1,15 +1,51 @@
-<ion-view id="view-map-edit" title="MapEdit" ng-controller="MapEditCtrl" ng-init="initMap()">
-  <ion-content class="has-header padding">
-    <!--<div ng-if="currentEditableCircle">-->
-  	  Lat: {{currentEditableCircle.center.lat()}}, Lon: {{currentEditableCircle.center.lng()}}
-  	  <button ng-disabled="editedCircles.len == 0" ng-click="savePoints()">Save changes</button>
-      <button ng-click="addPoint()">Add new point</button>
-    <!--</div>-->
-    <h1>Map Edit</h1>
-    <div class="google-maps-wrapper ">
-	    <div id="googleMap" class="google-maps">
-
-	    </div>
-    </div>
-  </ion-content>
-</ion-view>
+<ion-side-menus ng-controller="MapEditCtrl">
+  <ion-side-menu-content>
+    <ion-header-bar class="bar-energized">
+      <button class="button button-icon icon ion-navicon-round"
+        menu-toggle="left"
+        ></button>
+      <h1 class="title">Map</h1>
+      <button class="button button-icon icon ion-navicon-round"
+        menu-toggle="right"
+        ></button>
+    </ion-header-bar>
+    <ion-content  ng-init="initMap()" id="container-map-edit">
+      <!--Lat: {{currentEditableCircle.center.lat()}}, Lon: {{currentEditableCircle.center.lng()}}-->      
+      <div class="google-maps-wrapper ">
+        <div id="googleMap" class="google-maps">
+        </div>
+      </div>
+    </ion-content>
+  </ion-side-menu-content>
+  <ion-side-menu side="left">
+    <ion-list class="navigation">
+      <ion-item nav-clear menu-close href="#/map" class="app-item-active">
+        Map
+      </ion-item>
+      <ion-item nav-clear menu-close href="#/profile">
+        Profile
+      </ion-item>
+      <ion-item ng-click="security.login()" ng-hide="security.isLoggedIn()">
+        Log in
+      </ion-item>
+      <ion-item ng-click="security.signUp()" ng-hide="security.isLoggedIn()">
+        Sign up
+      </ion-item>
+      <ion-item ng-click="security.logout()" ng-show="security.isLoggedIn()">
+        Log out
+      </ion-item>
+    </ion-list>
+  </ion-side-menu>
+  <ion-side-menu side="right">
+    <ion-list>
+      <ion-item>
+        <button class="button button-energized button-block" ng-click="addPoint()">
+          Add new point
+        </button>
+        <button class="button button-energized button-block" ng-disabled="editedCircles.len == 0" ng-click="savePoints()">
+          Save changes
+        </button>
+      </ion-item>
+    </ion-list>
+  </ion-side-menu>
+</ion-side-menus>

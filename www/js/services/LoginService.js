@@ -37,10 +37,14 @@
         scope: $scope,
         buttons: [
           {
-            text: 'Cancel'
+            text: 'Cancel',
+            type: 'button-stable',
+            onTap: function(e) {
+              return $scope.registrationDialog = null;
+            }
           }, {
             text: '<b>Sign up</b>',
-            type: 'button-positive',
+            type: 'button-balanced',
             onTap: function(e) {
               var User, promise;
               if (($scope.data.password != null) && ($scope.data.userName != null)) {
@@ -74,10 +78,14 @@
         scope: $scope,
         buttons: [
           {
-            text: 'Cancel'
+            text: 'Cancel',
+            type: 'button-stable',
+            onTap: function(e) {
+              return $scope.loginDialog = null;
+            }
           }, {
-            text: '<b>Save</b>',
-            type: 'button-positive',
+            text: '<b>Log in</b>',
+            type: 'button-balanced',
             onTap: function(e) {
               var form, promise;
               e.preventDefault();
@@ -109,6 +117,12 @@
       return $location.path(url);
     };
     factoryObj = {
+      openRegistrationDialog: function() {
+        return $scope.openRegistrationDialog();
+      },
+      openLoginDialog: function() {
+        return $scope.openLoginDialog();
+      },
       login: function(userName, password) {
         var deferred, handleResult;
         handleResult = function(result) {
@@ -141,6 +155,9 @@
         };
         return $http.post('signUp', User).then(handleResult);
         return deferred = $q.defer();
+      },
+      logout: function() {
+        return sessionStorage.removeItem("userName");
       },
       showLoginDialog: function() {
         return $scope.openLoginDialog();
@@ -183,6 +200,9 @@
           promise = SecurityRetryQueue.pushRetryFn('unauthorized-server', factoryObj.getSignedInUser);
           return promise;
         }
+      },
+      isLoggedIn: function() {
+        return sessionStorage.getItem("userName") != null;
       },
       changePassword: function(userName, oldPassword, newPassword) {
         var handleResult, requestData;

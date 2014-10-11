@@ -57,10 +57,13 @@ angular.module 'services'
       buttons: [
         { 
           text: 'Cancel',
+          type: 'button-stable',
+          onTap: ( e ) ->
+            $scope.registrationDialog = null
         },
         {
           text: '<b>Sign up</b>',
-          type: 'button-positive',
+          type: 'button-balanced',
           onTap: ( e ) ->
             if $scope.data.password? && $scope.data.userName?
               User = 
@@ -97,15 +100,18 @@ angular.module 'services'
           </div>
         </form>
       ''',
-      title: 'Please sign in',
+      title: 'Please log in',
       scope: $scope,
       buttons: [
         { 
           text: 'Cancel',
+          type: 'button-stable',
+          onTap: ( e ) ->
+            $scope.loginDialog = null
         },
         {
-          text: '<b>Save</b>',
-          type: 'button-positive',
+          text: '<b>Log in</b>',
+          type: 'button-balanced',
           onTap: ( e ) ->
 
             e.preventDefault()
@@ -133,6 +139,12 @@ angular.module 'services'
     $location.path url
 
   factoryObj = 
+    openRegistrationDialog: () ->
+      $scope.openRegistrationDialog()
+
+    openLoginDialog: () ->
+      $scope.openLoginDialog()
+
     login: ( userName, password ) ->
       handleResult = ( result ) ->
         if typeof result.data.then == "function"  
@@ -156,6 +168,9 @@ angular.module 'services'
       return $http.post( 'signUp', User )
         .then ( handleResult )
       deferred = $q.defer()
+
+    logout: () ->
+      sessionStorage.removeItem( "userName" )
 
     showLoginDialog: () ->
       $scope.openLoginDialog()
@@ -190,6 +205,9 @@ angular.module 'services'
       else 
         promise = SecurityRetryQueue.pushRetryFn 'unauthorized-server', factoryObj.getSignedInUser
         return promise
+
+    isLoggedIn: ->
+      sessionStorage.getItem( "userName" )?
 
     changePassword: ( userName, oldPassword, newPassword ) ->
       handleResult = ( result ) ->

@@ -1,4 +1,4 @@
-smallDatabaseForTesting = [
+window.smallDatabaseForTesting = [
     {
         "_id": 0,
         "lat": "47.5915877",

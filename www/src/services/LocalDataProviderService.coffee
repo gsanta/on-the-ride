@@ -1,6 +1,6 @@
 angular.module 'services'
 .factory 'LocalDataProviderService', ( $http, $q, MapConstants ) ->
-  console.log "lefut"
+
   idbSupported = false
   if "indexedDB" in window
     idbSupported = true 
