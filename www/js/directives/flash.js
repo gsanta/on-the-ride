@@ -3,11 +3,14 @@
   angular.module("directives").directive('flash', function($timeout) {
     return {
       restrict: 'E',
+      template: "<button></button>",
+      replace: true,
       scope: {
         content: "@",
         timeout: "@"
       },
       compile: function(element, attrs) {
+        element.css("display", "none");
         if (!attrs.timeout) {
           attrs.timeout = 3000;
         }
@@ -20,6 +23,7 @@
             element.text(value);
             element.css("display", "block");
             hideElement = function() {
+              scope.content = "";
               return element.css("display", "none");
             };
             return $timeout(hideElement, parseInt(scope.timeout, 10));

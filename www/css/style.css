@@ -1,7 +1,8 @@
 /* Empty. Add your own CSS if you like */
 
 .error {
-	border: 1px solid red;
+	/*border: 1px solid red;*/
+  background-color: #ef4e3a;
 }
 
 .success {
@@ -60,6 +61,9 @@
   border: 1px solid #f0b840;
 }
 
+.app-form-item {
+  margin-bottom: 5px;
+}
 
 /********************************/
 /*Profile*/

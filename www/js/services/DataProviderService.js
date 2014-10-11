@@ -23,6 +23,8 @@
         $http.get("/users/" + userName).then(function(resp) {
           if (resp.data.then != null) {
             return resp.data.then(function(resp2) {
+              console.log("user");
+              console.log(resp2);
               return deferred.resolve(resp2);
             });
           }

@@ -82,16 +82,6 @@ angular.module 'services'
 
       deferred = $q.defer()
 
-      # if db
-      #   loadRouteInfoFromIndexedDb( deferred )
-
-      # else
-      #   openRequest = openConnection()
-
-      #   openRequest.onsuccess = ( e ) ->
-      #     console.log "Success!"
-      #     db = e.target.result
-      #     loadRouteInfoFromIndexedDb( deferred )
       shouldPopulatePromise = shouldPopulateDb()
       that = this
       shouldPopulatePromise.then ( should ) ->

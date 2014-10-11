@@ -23,6 +23,8 @@ angular.module 'services'
       .then ( resp ) ->
         if resp.data.then? 
           resp.data.then ( resp2 ) ->
+            console.log("user")
+            console.log( resp2 )
             deferred.resolve( resp2 )
 
       deferred.promise

@@ -74,7 +74,7 @@
       }
       $scope.loginDialog = $ionicPopup.show({
         template: '<form name="loginForm" novalidate>\n  <div class="list">\n    <label class="item item-input">\n      <input type="text" placeholder="Username" ng-model="data.userName" required>\n    </label>\n    <label class="item item-input">\n      <input type="password" placeholder="Password" ng-model="data.password" required>\n    </label>\n    <a ng-click="register()">Not registered, take me to sign up</a>\n  </div>\n</form>',
-        title: 'Please sign in',
+        title: 'Please log in',
         scope: $scope,
         buttons: [
           {

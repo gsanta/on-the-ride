@@ -4,6 +4,11 @@
       <button class="button button-icon icon ion-navicon-round"
         menu-toggle="left"
         ></button>
+
+      <img gravatar-src="'{{profile.email}}'" gravatar-size="40" ng-if="security.isLoggedIn()">
+      <span ng-hide="security.isLoggedIn()">Logged out</span>
+
+
       <h1 class="title">Map</h1>
       <button class="button button-icon icon ion-navicon-round"
         menu-toggle="right"

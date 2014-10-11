@@ -4,15 +4,16 @@
     var promise;
     promise = DataProvider.getUserInfo("gsanta");
     promise.then(function(data) {
-      return $scope.user = data;
+      $scope.user = data;
+      return $scope.savedUser = angular.copy($scope.user);
     });
     $scope.user = {};
+    $scope.savedUser = {};
     $scope.newPassword = void 0;
     $scope.passwordChange = {};
     $scope.getCssClasses = function(ngModelContoller) {
       return {
-        error: ngModelContoller.$invalid && ngModelContoller.$dirty,
-        success: ngModelContoller.$valid && ngModelContoller.$dirty
+        error: ngModelContoller.$invalid && ngModelContoller.$dirty
       };
     };
     $scope.showError = function(ngModelController, error) {
@@ -21,6 +22,10 @@
     };
     $scope.canSaveForm = function(form) {
       return form.$valid;
+    };
+    $scope.canSaveProfileForm = function(form) {
+      console.log($scope.savedUser);
+      return form.$valid && ($scope.user.email !== $scope.savedUser.email);
     };
     $scope.submitPasswordChangeForm = function(form) {
       if (form.$dirty && form.$invalid) {
@@ -40,6 +45,7 @@
       promise = UserService.changeProfileData($scope.user.userName, $scope.user);
       return promise.then(function(User) {
         $scope.user = User;
+        $scope.savedUser = angular.copy($scope.user);
         form.$setPristine();
         return $scope.profileFlashMessage = "changes saved";
       });
