@@ -5,7 +5,7 @@ angular.module "directives"
     template: "<button></button>"
     replace: true
     scope: {
-      content: "@"
+      content: "="
       timeout: "@"
     }
     compile: ( element, attrs ) ->
@@ -15,15 +15,19 @@ angular.module "directives"
 
       return (scope, element, attrs) ->
 
-        scope.$watch "content", ( value ) ->
+        scope.$watch () -> return scope.content, 
+        ( value ) ->
           if value == ""
             return
 
           element.text( value )
           element.css( "display", "block")
+          scope.content = ""
 
           hideElement = () ->
-            scope.content = ""
+            scope.content = "" 
+            scope.$apply () ->
+              scope.content = ""
             element.css( "display", "none" )
 
           $timeout hideElement, parseInt( scope.timeout, 10 )

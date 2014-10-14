@@ -6,7 +6,7 @@
       template: "<button></button>",
       replace: true,
       scope: {
-        content: "@",
+        content: "=",
         timeout: "@"
       },
       compile: function(element, attrs) {
@@ -15,15 +15,21 @@
           attrs.timeout = 3000;
         }
         return function(scope, element, attrs) {
-          return scope.$watch("content", function(value) {
+          return scope.$watch(function() {
+            return scope.content;
+          }, function(value) {
             var hideElement;
             if (value === "") {
               return;
             }
             element.text(value);
             element.css("display", "block");
+            scope.content = "";
             hideElement = function() {
               scope.content = "";
+              scope.$apply(function() {
+                return scope.content = "";
+              });
               return element.css("display", "none");
             };
             return $timeout(hideElement, parseInt(scope.timeout, 10));

@@ -35,51 +35,9 @@ angular.module 'services'
     if $scope.registrationDialog
       throw new Error 'Trying to open a dialog that is already open!'
     $scope.registrationDialog = $ionicPopup.show
-      template: '''
-          <div class="list">
-            <label class="item item-input">
-              <input type="text" placeholder="Username" ng-model="data.userName">
-            </label>
-            <label class="item item-input">
-              <input type="email" placeholder="Email" ng-model="data.email">
-            </label>
-            <label class="item item-input">
-              <input type="password" placeholder="Password" ng-model="data.password">
-            </label>
-            <label class="item item-input">
-              <input type="password" placeholder="Repeat password" ng-model="data.passwordRepeat">
-            </label>
-            <a ng-click="login()">Already registered, take me to sign in</a>
-          </div>
-      ''',
+      templateUrl: "/templates/registration.html",
       title: 'Please sign up',
-      scope: $scope,
-      buttons: [
-        { 
-          text: 'Cancel',
-          type: 'button-stable',
-          onTap: ( e ) ->
-            $scope.registrationDialog = null
-        },
-        {
-          text: '<b>Sign up</b>',
-          type: 'button-balanced',
-          onTap: ( e ) ->
-            if $scope.data.password? && $scope.data.userName?
-              User = 
-                userName: $scope.data.userName,
-                password: $scope.data.password,
-                email: $scope.data.email
-              promise = factoryObj.signUp User
-              promise.then () ->
-                $scope.registrationDialog.close()
-                $scope.registrationDialog = undefined
-                $scope.retryAuthentication()
-              , () ->
-                console.log "regisztrációs hiba"
-            
-        } 
-      ]
+      scope: $scope
 
   $scope.openLoginDialog = () ->
     $scope.data = {}
@@ -87,45 +45,9 @@ angular.module 'services'
     if $scope.loginDialog
       throw new Error 'Trying to open a dialog that is already open!'
     $scope.loginDialog = $ionicPopup.show
-      template: '''
-        <form name="loginForm" novalidate>
-          <div class="list">
-            <label class="item item-input">
-              <input type="text" placeholder="Username" ng-model="data.userName" required>
-            </label>
-            <label class="item item-input">
-              <input type="password" placeholder="Password" ng-model="data.password" required>
-            </label>
-            <a ng-click="register()">Not registered, take me to sign up</a>
-          </div>
-        </form>
-      ''',
+      templateUrl: "/templates/login.html"
       title: 'Please log in',
-      scope: $scope,
-      buttons: [
-        { 
-          text: 'Cancel',
-          type: 'button-stable',
-          onTap: ( e ) ->
-            $scope.loginDialog = null
-        },
-        {
-          text: '<b>Log in</b>',
-          type: 'button-balanced',
-          onTap: ( e ) ->
-
-            e.preventDefault()
-            form = $scope.loginForm
-            if $scope.data.password? && $scope.data.userName?
-              promise = factoryObj.login $scope.data.userName, $scope.data.password
-              promise.then () ->
-                $scope.loginDialog.close()
-                $scope.loginDialog = undefined
-                $scope.retryAuthentication()
-              , () ->
-                console.log "bejelentkezési hiba"
-        } 
-      ]
+      scope: $scope 
 
     $scope.retryAuthentication = () ->
       SecurityRetryQueue.retryAll()
@@ -144,6 +66,17 @@ angular.module 'services'
 
     openLoginDialog: () ->
       $scope.openLoginDialog()
+
+    closeLoginDialog: () ->
+      $scope.loginDialog.close()
+      $scope.loginDialog = undefined
+
+    closeRegistrationDialog: () ->
+      $scope.registrationDialog.close()
+      $scope.registrationDialog = undefined
+
+    retryAuthentication: () ->
+      SecurityRetryQueue.retryAll()
 
     login: ( userName, password ) ->
       handleResult = ( result ) ->

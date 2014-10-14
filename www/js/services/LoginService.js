@@ -32,39 +32,9 @@
         throw new Error('Trying to open a dialog that is already open!');
       }
       return $scope.registrationDialog = $ionicPopup.show({
-        template: '<div class="list">\n  <label class="item item-input">\n    <input type="text" placeholder="Username" ng-model="data.userName">\n  </label>\n  <label class="item item-input">\n    <input type="email" placeholder="Email" ng-model="data.email">\n  </label>\n  <label class="item item-input">\n    <input type="password" placeholder="Password" ng-model="data.password">\n  </label>\n  <label class="item item-input">\n    <input type="password" placeholder="Repeat password" ng-model="data.passwordRepeat">\n  </label>\n  <a ng-click="login()">Already registered, take me to sign in</a>\n</div>',
+        templateUrl: "/templates/registration.html",
         title: 'Please sign up',
-        scope: $scope,
-        buttons: [
-          {
-            text: 'Cancel',
-            type: 'button-stable',
-            onTap: function(e) {
-              return $scope.registrationDialog = null;
-            }
-          }, {
-            text: '<b>Sign up</b>',
-            type: 'button-balanced',
-            onTap: function(e) {
-              var User, promise;
-              if (($scope.data.password != null) && ($scope.data.userName != null)) {
-                User = {
-                  userName: $scope.data.userName,
-                  password: $scope.data.password,
-                  email: $scope.data.email
-                };
-                promise = factoryObj.signUp(User);
-                return promise.then(function() {
-                  $scope.registrationDialog.close();
-                  $scope.registrationDialog = void 0;
-                  return $scope.retryAuthentication();
-                }, function() {
-                  return console.log("regisztrációs hiba");
-                });
-              }
-            }
-          }
-        ]
+        scope: $scope
       });
     };
     $scope.openLoginDialog = function() {
@@ -73,36 +43,9 @@
         throw new Error('Trying to open a dialog that is already open!');
       }
       $scope.loginDialog = $ionicPopup.show({
-        template: '<form name="loginForm" novalidate>\n  <div class="list">\n    <label class="item item-input">\n      <input type="text" placeholder="Username" ng-model="data.userName" required>\n    </label>\n    <label class="item item-input">\n      <input type="password" placeholder="Password" ng-model="data.password" required>\n    </label>\n    <a ng-click="register()">Not registered, take me to sign up</a>\n  </div>\n</form>',
+        templateUrl: "/templates/login.html",
         title: 'Please log in',
-        scope: $scope,
-        buttons: [
-          {
-            text: 'Cancel',
-            type: 'button-stable',
-            onTap: function(e) {
-              return $scope.loginDialog = null;
-            }
-          }, {
-            text: '<b>Log in</b>',
-            type: 'button-balanced',
-            onTap: function(e) {
-              var form, promise;
-              e.preventDefault();
-              form = $scope.loginForm;
-              if (($scope.data.password != null) && ($scope.data.userName != null)) {
-                promise = factoryObj.login($scope.data.userName, $scope.data.password);
-                return promise.then(function() {
-                  $scope.loginDialog.close();
-                  $scope.loginDialog = void 0;
-                  return $scope.retryAuthentication();
-                }, function() {
-                  return console.log("bejelentkezési hiba");
-                });
-              }
-            }
-          }
-        ]
+        scope: $scope
       });
       $scope.retryAuthentication = function() {
         return SecurityRetryQueue.retryAll();
@@ -122,6 +65,17 @@
       },
       openLoginDialog: function() {
         return $scope.openLoginDialog();
+      },
+      closeLoginDialog: function() {
+        $scope.loginDialog.close();
+        return $scope.loginDialog = void 0;
+      },
+      closeRegistrationDialog: function() {
+        $scope.registrationDialog.close();
+        return $scope.registrationDialog = void 0;
+      },
+      retryAuthentication: function() {
+        return SecurityRetryQueue.retryAll();
       },
       login: function(userName, password) {
         var deferred, handleResult;

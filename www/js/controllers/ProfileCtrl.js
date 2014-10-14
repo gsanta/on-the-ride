@@ -7,24 +7,27 @@
       $scope.user = data;
       return $scope.savedUser = angular.copy($scope.user);
     });
+    window.scope = $scope;
     $scope.user = {};
     $scope.savedUser = {};
     $scope.newPassword = void 0;
     $scope.passwordChange = {};
+    $scope.profileFlashMessage = $scope.passwordFlashMessage = "";
+    $scope.getValue = function() {
+      return console.log($scope.profileFlashMessage);
+    };
     $scope.getCssClasses = function(ngModelContoller) {
       return {
         error: ngModelContoller.$invalid && ngModelContoller.$dirty
       };
     };
     $scope.showError = function(ngModelController, error) {
-      console.log("shoError: " + ngModelController.$error[error]);
       return ngModelController.$error[error];
     };
     $scope.canSaveForm = function(form) {
       return form.$valid;
     };
     $scope.canSaveProfileForm = function(form) {
-      console.log($scope.savedUser);
       return form.$valid && ($scope.user.email !== $scope.savedUser.email);
     };
     $scope.submitPasswordChangeForm = function(form) {
@@ -42,12 +45,14 @@
       if (form.$dirty && form.$invalid) {
         return;
       }
+      console.log("1: " + $scope.profileFlashMessage);
       promise = UserService.changeProfileData($scope.user.userName, $scope.user);
       return promise.then(function(User) {
         $scope.user = User;
         $scope.savedUser = angular.copy($scope.user);
         form.$setPristine();
-        return $scope.profileFlashMessage = "changes saved";
+        $scope.profileFlashMessage = "changes saved: " + Date.now();
+        return console.log("2: " + $scope.profileFlashMessage);
       });
     };
   });

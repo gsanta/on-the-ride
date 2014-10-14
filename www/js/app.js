@@ -23,6 +23,10 @@
           return LoginService.getSignedInUser();
         }
       }
+    }).state('loginTemp', {
+      url: "/loginTemp",
+      templateUrl: 'templates/login.html',
+      controller: 'LoginCtrl'
     });
     return $urlRouterProvider.otherwise('/map');
   });

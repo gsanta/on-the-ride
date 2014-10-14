@@ -6,6 +6,8 @@ angular.module "controllers"
     $scope.user = data
     $scope.savedUser = angular.copy $scope.user
 
+  window.scope = $scope
+
   $scope.user = {}
 
   $scope.savedUser = {}
@@ -16,20 +18,23 @@ angular.module "controllers"
 
   }
 
+  $scope.profileFlashMessage = $scope.passwordFlashMessage = ""
+
+  $scope.getValue = () ->
+    console.log $scope.profileFlashMessage
+
   $scope.getCssClasses = ( ngModelContoller ) ->
     return {
       error: ngModelContoller.$invalid && ngModelContoller.$dirty,
     }
 
   $scope.showError = ( ngModelController , error ) ->
-    console.log("shoError: #{ngModelController.$error[ error ]}" )
     return ngModelController.$error[ error ]
 
   $scope.canSaveForm = ( form ) ->
     return form.$valid
 
   $scope.canSaveProfileForm = ( form ) ->
-    console.log($scope.savedUser)
     return form.$valid && ( $scope.user.email != $scope.savedUser.email )
 
   $scope.submitPasswordChangeForm = ( form ) ->
@@ -47,14 +52,16 @@ angular.module "controllers"
   $scope.submitProfileForm = ( form ) ->
     if form.$dirty && form.$invalid
       return
-
+    console.log "1: #{$scope.profileFlashMessage}"
     promise = UserService.changeProfileData $scope.user.userName, $scope.user
 
     promise.then ( User ) ->
       $scope.user = User
       $scope.savedUser = angular.copy $scope.user
       form.$setPristine()
-      $scope.profileFlashMessage = "changes saved"
+
+      $scope.profileFlashMessage = "changes saved: " + Date.now() 
+      console.log "2: #{$scope.profileFlashMessage}"
 
 
 

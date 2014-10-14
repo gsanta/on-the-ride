@@ -1,5 +1,5 @@
 angular.module "controllers"
-.controller 'LoginCtrl', ( $scope, $http, $timeout, LoginService ) ->
+.controller 'RegistrationCtrl', ( $scope, $http, $timeout, LoginService ) ->
 
     $scope.form = undefined
 
@@ -9,12 +9,16 @@ angular.module "controllers"
 
     $scope.submitForm = ( form ) ->
       if form.$valid
-        promise = LoginService.login $scope.user.userName, $scope.user.password
+        User = 
+          userName: $scope.user.userName,
+          password: $scope.user.password,
+          email: $scope.user.email
+        promise = LoginService.signUp User
         promise.then () ->
-          LoginService.closeLoginDialog()
+          LoginService.closeRegistrationDialog()
           LoginService.retryAuthentication()
         , () ->
-          console.log "bejelentkezési hiba"
+          console.log "regisztrációs hiba"
 
 
     $scope.getCssClasses = ( ngModelContoller ) ->
@@ -26,4 +30,4 @@ angular.module "controllers"
       return ngModelController.$error[ error ]
 
     $scope.cancelForm = () ->
-      LoginService.closeLoginDialog()
+      LoginService.closeRegistrationDialog()

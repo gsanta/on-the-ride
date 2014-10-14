@@ -87,6 +87,12 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes', 'dire
       }
     })
 
+    .state('loginTemp', {
+      url: "/loginTemp",
+      templateUrl: 'templates/login.html',
+      controller: 'LoginCtrl',
+    })
+
     # .state('app.browse', {
     #   url: "/browse",
     #   views: {
