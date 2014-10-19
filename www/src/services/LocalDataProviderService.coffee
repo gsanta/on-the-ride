@@ -272,6 +272,7 @@ angular.module 'services'
       deferred = $q.defer()
 
       loadUserVoteForNode = ( def ) ->
+        nodeId = parseInt nodeId
         transaction = db.transaction [ "votes" ], "readonly"
         store = transaction.objectStore "votes"
         cursor = store.openCursor()
@@ -319,8 +320,9 @@ angular.module 'services'
 
       promise = factoryObj.getUserVoteForNode userName, nodeId
 
+      deferred = $q.defer()
+
       promise.then ( data ) ->
-        deferred = $q.defer()
 
         if data?
           data.vote = vote
@@ -331,6 +333,44 @@ angular.module 'services'
             node: nodeId
             vote: vote
           setUserVoteForNodeToIndexDb deferred, data, false
+
+      deferred.promise
+
+    getVotesForNode: ( nodeId ) ->
+      deferred = $q.defer()
+
+      loadUserVoteForNode = ( def ) ->
+        nodeId = parseInt nodeId
+        transaction = db.transaction [ "votes" ], "readonly"
+        store = transaction.objectStore "votes"
+        cursor = store.openCursor()
+
+        votes =
+          nodeId: nodeId
+          pos: 0
+          neg: 0
+
+        cursor.onsuccess = ( e ) ->
+          actVote = e.target.result
+          if actVote?
+            if actVote.value.node == nodeId
+              if actVote.value.vote == 0
+                votes.neg += 1
+              else if actVote.value.vote == 2
+                votes.pos += 1
+            actVote.continue();
+
+        transaction.oncomplete = ( e ) ->
+          def.resolve votes
+
+      if db
+        loadUserVoteForNode( deferred )
+      else
+        openRequest = openConnection()
+
+        openRequest.onsuccess = ( e ) ->
+          db = e.target.result
+          loadUserVoteForNode( deferred )
 
       deferred.promise
 

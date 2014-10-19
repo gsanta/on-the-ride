@@ -1,6 +1,6 @@
 angular.module "controllers"
 .controller 'MapEditCtrl', ( $scope, $http, $timeout, Map, DataProvider,
-  LocalDataProviderService, Coord ) ->
+  LocalDataProviderService, Coord, LoginService ) ->
 
   routePolyline = undefined
   canLoadMapAgain = true
@@ -48,6 +48,10 @@ angular.module "controllers"
   $scope.currentEditableCircle = undefined
   $scope.editedCircles = {
     len: 0
+  }
+
+  $scope.infoWindow = {
+    isDisplayed: false
   }
 
   $scope.loadRoute = () ->
@@ -143,3 +147,24 @@ angular.module "controllers"
     dragEnd circle
 
   $scope.infoBoxes = []
+
+  $scope.vote = {
+    value: 1
+    isReset: true
+  }
+
+  $scope.$watch( 'vote.isReset', ( newValue, oldValue ) ->
+    console.log "reset watch: #{newValue}"
+  )
+
+  $scope.$watch( 'vote.value', ( newValue, oldValue ) ->
+    console.log "reset: #{$scope.vote.isReset}"
+    newValue = parseInt newValue
+    oldValue = parseInt oldValue
+    if( !$scope.vote.isReset && newValue != oldValue )
+      console.log "send: #{oldValue},#{newValue}, #{$scope.vote.isReset}"
+      user = LoginService.getUserName()
+      nodeId = $scope.actNode._id
+      Map.sendUserVoteForNode user, nodeId, newValue
+    $scope.vote.isReset = false
+  )

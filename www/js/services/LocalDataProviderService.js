@@ -302,6 +302,7 @@
         deferred = $q.defer();
         loadUserVoteForNode = function(def) {
           var cursor, store, transaction, vote;
+          nodeId = parseInt(nodeId);
           transaction = db.transaction(["votes"], "readonly");
           store = transaction.objectStore("votes");
           cursor = store.openCursor();
@@ -334,7 +335,7 @@
         return deferred.promise;
       },
       setUserVoteForNode: function(userName, nodeId, vote) {
-        var promise, setUserVoteForNodeToIndexDb;
+        var deferred, promise, setUserVoteForNodeToIndexDb;
         setUserVoteForNodeToIndexDb = function(def, data, isUpdate) {
           var request, store, transaction;
           transaction = db.transaction(["votes"], "readwrite");
@@ -352,9 +353,8 @@
           };
         };
         promise = factoryObj.getUserVoteForNode(userName, nodeId);
+        deferred = $q.defer();
         promise.then(function(data) {
-          var deferred;
-          deferred = $q.defer();
           if (data != null) {
             data.vote = vote;
             return setUserVoteForNodeToIndexDb(deferred, data, true);
@@ -367,6 +367,49 @@
             return setUserVoteForNodeToIndexDb(deferred, data, false);
           }
         });
+        return deferred.promise;
+      },
+      getVotesForNode: function(nodeId) {
+        var deferred, loadUserVoteForNode, openRequest;
+        deferred = $q.defer();
+        loadUserVoteForNode = function(def) {
+          var cursor, store, transaction, votes;
+          nodeId = parseInt(nodeId);
+          transaction = db.transaction(["votes"], "readonly");
+          store = transaction.objectStore("votes");
+          cursor = store.openCursor();
+          votes = {
+            nodeId: nodeId,
+            pos: 0,
+            neg: 0
+          };
+          cursor.onsuccess = function(e) {
+            var actVote;
+            actVote = e.target.result;
+            if (actVote != null) {
+              if (actVote.value.node === nodeId) {
+                if (actVote.value.vote === 0) {
+                  votes.neg += 1;
+                } else if (actVote.value.vote === 2) {
+                  votes.pos += 1;
+                }
+              }
+              return actVote["continue"]();
+            }
+          };
+          return transaction.oncomplete = function(e) {
+            return def.resolve(votes);
+          };
+        };
+        if (db) {
+          loadUserVoteForNode(deferred);
+        } else {
+          openRequest = openConnection();
+          openRequest.onsuccess = function(e) {
+            db = e.target.result;
+            return loadUserVoteForNode(deferred);
+          };
+        }
         return deferred.promise;
       }
     };

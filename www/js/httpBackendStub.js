@@ -47,13 +47,27 @@
       promise = LocalDataProviderService.updateUser(obj.userName, newObj);
       return [200, promise, {}];
     });
-    $httpBackend.whenGET(/vote\/.*/).respond(function(method, url, data) {
-      var mapId, mapIdIndex, userName, userNameIndex;
+    $httpBackend.whenGET(/vote\/.*\/.*/).respond(function(method, url, data) {
+      var nodeId, nodeIdIndex, promise, userName, userNameIndex;
       userNameIndex = url.indexOf("/", 1);
-      mapIdIndex = url.lastIndexOf("/");
-      userName = url.substring(userNameIndex + 1, mapIdIndex);
-      mapId = url.substring(mapIdIndex + 1);
-      return [200, 1, {}];
+      nodeIdIndex = url.lastIndexOf("/");
+      userName = url.substring(userNameIndex + 1, nodeIdIndex);
+      nodeId = url.substring(nodeIdIndex + 1);
+      promise = LocalDataProviderService.getUserVoteForNode(userName, nodeId);
+      return [200, promise, {}];
+    });
+    $httpBackend.whenGET(/vote\/.*/).respond(function(method, url, data) {
+      var nodeId, nodeIdIndex, promise;
+      nodeIdIndex = url.lastIndexOf("/");
+      nodeId = url.substring(nodeIdIndex + 1);
+      promise = LocalDataProviderService.getVotesForNode(nodeId);
+      return [200, promise, {}];
+    });
+    $httpBackend.whenPOST('/vote/new').respond(function(method, url, data) {
+      var obj, promise;
+      obj = angular.fromJson(data);
+      promise = LocalDataProviderService.setUserVoteForNode(obj.user, obj.nodeId, obj.vote);
+      return [200, promise, {}];
     });
     return $httpBackend.whenGET(/templates\/.*/).passThrough();
   });

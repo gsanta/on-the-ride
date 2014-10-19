@@ -1,5 +1,5 @@
 angular.module "services"
-.factory "Map", ( DataProvider, LocalDataProviderService, MapConstants, Coord, $compile, LoginService, $http ) ->
+.factory "Map", ( DataProvider, LocalDataProviderService, MapConstants, Coord, $compile, LoginService, $http, $q ) ->
 
   mapZoomDiameterSquares = [
     5825,
@@ -152,8 +152,7 @@ angular.module "services"
 
             <div class="item range range-energized"> 
               <div> 
-              <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote">
-              <br>the vote: {{vote}}
+              <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote.value">
               </div>
               <div>
                 <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>
@@ -184,18 +183,29 @@ angular.module "services"
 
         google.maps.event.addListener marker, 'click', ((marker, compiled, scope, node) ->
           return () ->
-            factoryObj.getUserVoteToPoint( LoginService.getUserName(), node._id )
+            nodeId = parseInt node._id
+            userVotePromise = factoryObj.getUserVoteToPoint( LoginService.getUserName(), nodeId )
+            allVotesPromise = factoryObj.getAllVotesToNode nodeId
+
             scope.actNode = node
+            
+            allVotesPromise.then ( data ) ->
+              scope.actNode.vote_pos = data.pos
+              scope.actNode.vote_neg = data.neg
+
+            userVotePromise.then ( data ) ->
+              #scope.vote.isReset = true
+              scope.vote.value = data.vote
+            
             scope.$apply()
-            infowindow.setContent compiled[0].innerHTML
+            infowindow.setContent compiled[0] 
             infowindow.open googleMap, marker
         )( marker, compiled, scope, node )
 
-          # google.maps.event.addListener marker, 'click', () ->
-          #   console.log marker
-            
-
-
+      google.maps.event.addListener infowindow, 'closeclick', () ->
+        scope.vote.isReset = true
+        scope.vote.value = 1
+        scope.$apply()
 
       markers
 
@@ -284,6 +294,44 @@ angular.module "services"
         }
 
     getUserVoteToPoint: ( userName, nodeId ) ->
-      $http.get "/vote/#{userName}/#{nodeId}"
+      deferred = $q.defer()
+
+      httpPromise = $http.get "/vote/#{userName}/#{nodeId}"
+
+      httpPromise.then ( resp ) ->
+        if resp.data.then? 
+          resp.data.then ( data ) ->
+            if data == undefined
+              data = 
+                user: userName
+                node: nodeId
+                vote: 1
+            deferred.resolve( data )
+
+      deferred.promise
+
+    getAllVotesToNode: ( nodeId ) ->
+      deferred = $q.defer()
+
+      httpPromise = $http.get "/vote/#{nodeId}"
+
+      httpPromise.then ( resp ) ->
+        if resp.data.then? 
+          resp.data.then ( data ) ->
+            if data == undefined
+              data = 
+                nodeId: nodeId
+                pos: 0
+                neg: 0
+            deferred.resolve( data )
+
+      deferred.promise
+
+    sendUserVoteForNode: ( userName, nodeId, vote ) ->
+      $http.post "/vote/new", {
+        user: userName,
+        nodeId: nodeId,
+        vote: vote
+      }
 
   factoryObj

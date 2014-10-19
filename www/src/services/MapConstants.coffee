@@ -7,5 +7,5 @@ angular.module "services"
   latEnd: 30,
   lonEnd: 55,
   dbPrefix: "on_the_ride",
-  indexedDbVersion: 4
+  indexedDbVersion: 5
 }

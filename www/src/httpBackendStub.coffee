@@ -65,16 +65,38 @@ angular.module 'starter'
     return [200,  promise, {}];
   )
 
-  $httpBackend.whenGET( /vote\/.*/ )
+  $httpBackend.whenGET( /vote\/.*\/.*/ )
   .respond( ( method, url, data ) ->
     
     userNameIndex = url.indexOf "/", 1
-    mapIdIndex = url.lastIndexOf "/"
+    nodeIdIndex = url.lastIndexOf "/"
     
-    userName = url.substring userNameIndex + 1, mapIdIndex
-    mapId = url.substring mapIdIndex + 1
+    userName = url.substring userNameIndex + 1, nodeIdIndex
+    nodeId = url.substring nodeIdIndex + 1
 
-    return [200,  1, {}];
+    promise = LocalDataProviderService.getUserVoteForNode userName, nodeId
+
+    return [200,  promise, {}];
+  )
+
+  $httpBackend.whenGET( /vote\/.*/ )
+  .respond( ( method, url, data ) ->
+    
+    nodeIdIndex = url.lastIndexOf "/"
+    
+    nodeId = url.substring nodeIdIndex + 1
+
+    promise = LocalDataProviderService.getVotesForNode nodeId
+
+    return [200,  promise, {}];
+  )
+
+  $httpBackend.whenPOST( '/vote/new' )
+  .respond( ( method, url, data ) ->
+    obj = angular.fromJson data
+    promise = LocalDataProviderService.setUserVoteForNode obj.user, obj.nodeId, obj.vote
+
+    return [200,  promise, {}];
   )
 
   $httpBackend.whenGET( /templates\/.*/ ).passThrough()

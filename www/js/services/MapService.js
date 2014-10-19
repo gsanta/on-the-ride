@@ -2,7 +2,7 @@
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  angular.module("services").factory("Map", function(DataProvider, LocalDataProviderService, MapConstants, Coord, $compile, LoginService, $http) {
+  angular.module("services").factory("Map", function(DataProvider, LocalDataProviderService, MapConstants, Coord, $compile, LoginService, $http, $q) {
     var factoryObj, mapZoomDiameterSquares;
     mapZoomDiameterSquares = [5825, 1456.25, 364.0625, 91.016, 22.754, 5.691, 1.422, 0.3557, 0.0892];
     factoryObj = {
@@ -142,7 +142,7 @@
       createMarkersFromRoute: function(route, googleMap, scope) {
         var compiled, content, index, infowindow, marker, markerOptions, markers, node, _i, _len;
         markers = [];
-        content = '<div>\n  <div class="list">\n      <div class="item item-divider">\n        Basic info\n      </div>\n\n      <div class="item"> \n        User: {{actNode.user}}\n      </div>\n\n      <div class="item item-divider">\n        How accurate this point is?\n      </div>\n\n      <div class="item range range-energized"> \n        <div> \n        <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote">\n        <br>the vote: {{vote}}\n        </div>\n        <div>\n          <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>\n          <i class="icon ion-sad">&nbsp;{{actNode.vote_neg}}</i>\n        </div>\n      </div>\n  </div>\n</div>\n';
+        content = '<div>\n  <div class="list">\n      <div class="item item-divider">\n        Basic info\n      </div>\n\n      <div class="item"> \n        User: {{actNode.user}}\n      </div>\n\n      <div class="item item-divider">\n        How accurate this point is?\n      </div>\n\n      <div class="item range range-energized"> \n        <div> \n        <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote.value">\n        </div>\n        <div>\n          <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>\n          <i class="icon ion-sad">&nbsp;{{actNode.vote_neg}}</i>\n        </div>\n      </div>\n  </div>\n</div>\n';
         compiled = $compile(content)(scope);
         scope.markers = markers;
         infowindow = new google.maps.InfoWindow();
@@ -159,14 +159,29 @@
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', (function(marker, compiled, scope, node) {
             return function() {
-              factoryObj.getUserVoteToPoint(LoginService.getUserName(), node._id);
+              var allVotesPromise, nodeId, userVotePromise;
+              nodeId = parseInt(node._id);
+              userVotePromise = factoryObj.getUserVoteToPoint(LoginService.getUserName(), nodeId);
+              allVotesPromise = factoryObj.getAllVotesToNode(nodeId);
               scope.actNode = node;
+              allVotesPromise.then(function(data) {
+                scope.actNode.vote_pos = data.pos;
+                return scope.actNode.vote_neg = data.neg;
+              });
+              userVotePromise.then(function(data) {
+                return scope.vote.value = data.vote;
+              });
               scope.$apply();
-              infowindow.setContent(compiled[0].innerHTML);
+              infowindow.setContent(compiled[0]);
               return infowindow.open(googleMap, marker);
             };
           })(marker, compiled, scope, node));
         }
+        google.maps.event.addListener(infowindow, 'closeclick', function() {
+          scope.vote.isReset = true;
+          scope.vote.value = 1;
+          return scope.$apply();
+        });
         return markers;
       },
       addPointToCenterOfMap: function(googleMap) {
@@ -261,7 +276,51 @@
         return _results;
       },
       getUserVoteToPoint: function(userName, nodeId) {
-        return $http.get("/vote/" + userName + "/" + nodeId);
+        var deferred, httpPromise;
+        deferred = $q.defer();
+        httpPromise = $http.get("/vote/" + userName + "/" + nodeId);
+        httpPromise.then(function(resp) {
+          if (resp.data.then != null) {
+            return resp.data.then(function(data) {
+              if (data === void 0) {
+                data = {
+                  user: userName,
+                  node: nodeId,
+                  vote: 1
+                };
+              }
+              return deferred.resolve(data);
+            });
+          }
+        });
+        return deferred.promise;
+      },
+      getAllVotesToNode: function(nodeId) {
+        var deferred, httpPromise;
+        deferred = $q.defer();
+        httpPromise = $http.get("/vote/" + nodeId);
+        httpPromise.then(function(resp) {
+          if (resp.data.then != null) {
+            return resp.data.then(function(data) {
+              if (data === void 0) {
+                data = {
+                  nodeId: nodeId,
+                  pos: 0,
+                  neg: 0
+                };
+              }
+              return deferred.resolve(data);
+            });
+          }
+        });
+        return deferred.promise;
+      },
+      sendUserVoteForNode: function(userName, nodeId, vote) {
+        return $http.post("/vote/new", {
+          user: userName,
+          nodeId: nodeId,
+          vote: vote
+        });
       }
     };
     return factoryObj;
