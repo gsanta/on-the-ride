@@ -23,6 +23,9 @@ angular.module 'services'
       if !thisDB.objectStoreNames.contains( "users" )
         thisDB.createObjectStore "users", { autoIncrement: true }
 
+      if !thisDB.objectStoreNames.contains( "votes" )
+        thisDB.createObjectStore "votes", { autoIncrement: true }
+
     connRequest.onerror = ( e ) ->
       console.log "Error"
       console.dir e
@@ -116,6 +119,9 @@ angular.module 'services'
         store.clear()
 
         for node in smallDatabaseForTesting
+          node.vote_pos = 0
+          node.vote_neg = 0
+          node.user = "gsanta"
           store.add node
         def.resolve()
 
@@ -261,5 +267,72 @@ angular.module 'services'
           removedUserFromIndexedDb( deferred )
       
       deferred.promise
+
+    getUserVoteForNode: ( userName, nodeId ) ->
+      deferred = $q.defer()
+
+      loadUserVoteForNode = ( def ) ->
+        transaction = db.transaction [ "votes" ], "readonly"
+        store = transaction.objectStore "votes"
+        cursor = store.openCursor()
+
+        vote = undefined
+
+        cursor.onsuccess = ( e ) ->
+          actVote = e.target.result
+          if actVote?
+            if actVote.value.user == userName && actVote.value.node == nodeId
+              vote = actVote.value
+              vote.id = actVote.key
+            else 
+              actVote.continue();
+
+        transaction.oncomplete = ( e ) ->
+          def.resolve vote
+
+      if db
+        loadUserVoteForNode( deferred )
+      else
+        openRequest = openConnection()
+
+        openRequest.onsuccess = ( e ) ->
+          db = e.target.result
+          loadUserVoteForNode( deferred )
+
+      deferred.promise
+
+    setUserVoteForNode: ( userName, nodeId, vote ) ->
+      setUserVoteForNodeToIndexDb = ( def, data, isUpdate ) ->
+        transaction = db.transaction [ "votes" ], "readwrite"
+        store = transaction.objectStore "votes"
+
+        if isUpdate
+          request = store.put data, data.id
+        else
+          request = store.add data
+
+        request.onsuccess = ( e ) ->
+          def.resolve data
+
+        request.onerror = ( e ) ->
+          def.reject "problem with deleting user"
+
+      promise = factoryObj.getUserVoteForNode userName, nodeId
+
+      promise.then ( data ) ->
+        deferred = $q.defer()
+
+        if data?
+          data.vote = vote
+          setUserVoteForNodeToIndexDb deferred, data, true
+        else
+          data =
+            user: userName
+            node: nodeId
+            vote: vote
+          setUserVoteForNodeToIndexDb deferred, data, false
+
+      deferred.promise
+
 
   factoryObj

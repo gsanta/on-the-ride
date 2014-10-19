@@ -111,7 +111,8 @@
         return deferred = $q.defer();
       },
       logout: function() {
-        return sessionStorage.removeItem("userName");
+        sessionStorage.removeItem("userName");
+        return $location.path('/newValue');
       },
       showLoginDialog: function() {
         return $scope.openLoginDialog();
@@ -154,6 +155,9 @@
           promise = SecurityRetryQueue.pushRetryFn('unauthorized-server', factoryObj.getSignedInUser);
           return promise;
         }
+      },
+      getUserName: function() {
+        return sessionStorage.getItem("userName");
       },
       isLoggedIn: function() {
         return sessionStorage.getItem("userName") != null;

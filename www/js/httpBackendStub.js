@@ -47,6 +47,14 @@
       promise = LocalDataProviderService.updateUser(obj.userName, newObj);
       return [200, promise, {}];
     });
+    $httpBackend.whenGET(/vote\/.*/).respond(function(method, url, data) {
+      var mapId, mapIdIndex, userName, userNameIndex;
+      userNameIndex = url.indexOf("/", 1);
+      mapIdIndex = url.lastIndexOf("/");
+      userName = url.substring(userNameIndex + 1, mapIdIndex);
+      mapId = url.substring(mapIdIndex + 1);
+      return [200, 1, {}];
+    });
     return $httpBackend.whenGET(/templates\/.*/).passThrough();
   });
 

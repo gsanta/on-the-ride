@@ -65,4 +65,16 @@ angular.module 'starter'
     return [200,  promise, {}];
   )
 
+  $httpBackend.whenGET( /vote\/.*/ )
+  .respond( ( method, url, data ) ->
+    
+    userNameIndex = url.indexOf "/", 1
+    mapIdIndex = url.lastIndexOf "/"
+    
+    userName = url.substring userNameIndex + 1, mapIdIndex
+    mapId = url.substring mapIdIndex + 1
+
+    return [200,  1, {}];
+  )
+
   $httpBackend.whenGET( /templates\/.*/ ).passThrough()

@@ -69,26 +69,15 @@
       window.$scope = $scope;
       routeInfoPromise = LocalDataProviderService.loadRouteInfo();
       return routeInfoPromise.then(function(data) {
-        var centerCoordinates, circle, circles, index, _i, _len, _results;
+        var centerCoordinates, circles;
         $scope.routeInfo = data;
         centerCoordinates = Map.createCoordinate(data[0].lat, data[0].lon);
         $scope.map = new google.maps.Map(document.querySelector('#container-map-edit').querySelector('#googleMap'), Map.createMapProperties(centerCoordinates, 3));
-        circles = Map.createPointsFromRoute(data, $scope.map);
-        _results = [];
-        for (index = _i = 0, _len = circles.length; _i < _len; index = ++_i) {
-          circle = circles[index];
-          dragEnd(circle);
-          dragStart(circle);
-          click(circle);
-          _results.push(void 0);
-        }
-        return _results;
+        return circles = Map.createMarkersFromRoute(data, $scope.map, $scope);
       });
     };
     $scope.savePoints = function() {
       var addCircles, k, pointOptions, updateCircles, v, _ref;
-      console.log("savePoints");
-      console.log($scope.editedCircles);
       updateCircles = [];
       addCircles = [];
       _ref = $scope.editedCircles;

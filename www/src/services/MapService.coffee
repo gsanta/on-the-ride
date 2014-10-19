@@ -1,5 +1,5 @@
 angular.module "services"
-.factory "Map", ( DataProvider, LocalDataProviderService, MapConstants, Coord ) ->
+.factory "Map", ( DataProvider, LocalDataProviderService, MapConstants, Coord, $compile, LoginService, $http ) ->
 
   mapZoomDiameterSquares = [
     5825,
@@ -131,6 +131,74 @@ angular.module "services"
         circles.push circle
       circles
 
+    createMarkersFromRoute: ( route, googleMap, scope ) ->
+
+      markers = []
+
+      content = '''
+      <div>
+        <div class="list">
+            <div class="item item-divider">
+              Basic info
+            </div>
+
+            <div class="item"> 
+              User: {{actNode.user}}
+            </div>
+
+            <div class="item item-divider">
+              How accurate this point is?
+            </div>
+
+            <div class="item range range-energized"> 
+              <div> 
+              <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote">
+              <br>the vote: {{vote}}
+              </div>
+              <div>
+                <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>
+                <i class="icon ion-sad">&nbsp;{{actNode.vote_neg}}</i>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      '''
+      compiled = $compile(content)(scope);
+
+      scope.markers = markers
+
+      infowindow = new google.maps.InfoWindow()
+
+      for node, index in route
+        markerOptions =
+          map: googleMap,
+          draggable: true,
+          animation: google.maps.Animation.DROP,
+          position: new google.maps.LatLng node.lat, node.lon
+
+        marker = new google.maps.Marker markerOptions
+        marker._id = node._id
+
+        markers.push marker
+
+        google.maps.event.addListener marker, 'click', ((marker, compiled, scope, node) ->
+          return () ->
+            factoryObj.getUserVoteToPoint( LoginService.getUserName(), node._id )
+            scope.actNode = node
+            scope.$apply()
+            infowindow.setContent compiled[0].innerHTML
+            infowindow.open googleMap, marker
+        )( marker, compiled, scope, node )
+
+          # google.maps.event.addListener marker, 'click', () ->
+          #   console.log marker
+            
+
+
+
+      markers
+
     addPointToCenterOfMap: ( googleMap ) ->
 
       pointOptions =
@@ -214,5 +282,8 @@ angular.module "services"
           lat: circle.center.lat(),
           lon: circle.center.lng()
         }
+
+    getUserVoteToPoint: ( userName, nodeId ) ->
+      $http.get "/vote/#{userName}/#{nodeId}"
 
   factoryObj

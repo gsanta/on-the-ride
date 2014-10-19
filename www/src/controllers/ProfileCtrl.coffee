@@ -1,8 +1,9 @@
 angular.module "controllers"
 .controller 'ProfileCtrl', ( $scope, DataProvider, LoginService, UserService ) ->
   
-  promise = DataProvider.getUserInfo( "gsanta" )
+  promise = DataProvider.getUserInfo( LoginService.getSignedInUser() )
   promise.then ( data ) ->
+    console.log data
     $scope.user = data
     $scope.savedUser = angular.copy $scope.user
 

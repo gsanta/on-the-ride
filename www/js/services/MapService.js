@@ -2,7 +2,7 @@
 (function() {
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  angular.module("services").factory("Map", function(DataProvider, LocalDataProviderService, MapConstants, Coord) {
+  angular.module("services").factory("Map", function(DataProvider, LocalDataProviderService, MapConstants, Coord, $compile, LoginService, $http) {
     var factoryObj, mapZoomDiameterSquares;
     mapZoomDiameterSquares = [5825, 1456.25, 364.0625, 91.016, 22.754, 5.691, 1.422, 0.3557, 0.0892];
     factoryObj = {
@@ -139,6 +139,36 @@
         }
         return circles;
       },
+      createMarkersFromRoute: function(route, googleMap, scope) {
+        var compiled, content, index, infowindow, marker, markerOptions, markers, node, _i, _len;
+        markers = [];
+        content = '<div>\n  <div class="list">\n      <div class="item item-divider">\n        Basic info\n      </div>\n\n      <div class="item"> \n        User: {{actNode.user}}\n      </div>\n\n      <div class="item item-divider">\n        How accurate this point is?\n      </div>\n\n      <div class="item range range-energized"> \n        <div> \n        <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote">\n        <br>the vote: {{vote}}\n        </div>\n        <div>\n          <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>\n          <i class="icon ion-sad">&nbsp;{{actNode.vote_neg}}</i>\n        </div>\n      </div>\n  </div>\n</div>\n';
+        compiled = $compile(content)(scope);
+        scope.markers = markers;
+        infowindow = new google.maps.InfoWindow();
+        for (index = _i = 0, _len = route.length; _i < _len; index = ++_i) {
+          node = route[index];
+          markerOptions = {
+            map: googleMap,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+            position: new google.maps.LatLng(node.lat, node.lon)
+          };
+          marker = new google.maps.Marker(markerOptions);
+          marker._id = node._id;
+          markers.push(marker);
+          google.maps.event.addListener(marker, 'click', (function(marker, compiled, scope, node) {
+            return function() {
+              factoryObj.getUserVoteToPoint(LoginService.getUserName(), node._id);
+              scope.actNode = node;
+              scope.$apply();
+              infowindow.setContent(compiled[0].innerHTML);
+              return infowindow.open(googleMap, marker);
+            };
+          })(marker, compiled, scope, node));
+        }
+        return markers;
+      },
       addPointToCenterOfMap: function(googleMap) {
         var circle, pointOptions;
         pointOptions = {
@@ -229,6 +259,9 @@
           }));
         }
         return _results;
+      },
+      getUserVoteToPoint: function(userName, nodeId) {
+        return $http.get("/vote/" + userName + "/" + nodeId);
       }
     };
     return factoryObj;

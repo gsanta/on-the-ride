@@ -104,6 +104,7 @@ angular.module 'services'
 
     logout: () ->
       sessionStorage.removeItem( "userName" )
+      $location.path('/newValue')
 
     showLoginDialog: () ->
       $scope.openLoginDialog()
@@ -138,6 +139,9 @@ angular.module 'services'
       else 
         promise = SecurityRetryQueue.pushRetryFn 'unauthorized-server', factoryObj.getSignedInUser
         return promise
+
+    getUserName: ->
+      sessionStorage.getItem "userName"
 
     isLoggedIn: ->
       sessionStorage.getItem( "userName" )?

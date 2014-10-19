@@ -22,7 +22,12 @@
           });
         }
         if (!thisDB.objectStoreNames.contains("users")) {
-          return thisDB.createObjectStore("users", {
+          thisDB.createObjectStore("users", {
+            autoIncrement: true
+          });
+        }
+        if (!thisDB.objectStoreNames.contains("votes")) {
+          return thisDB.createObjectStore("votes", {
             autoIncrement: true
           });
         }
@@ -131,6 +136,9 @@
           store.clear();
           for (_i = 0, _len = smallDatabaseForTesting.length; _i < _len; _i++) {
             node = smallDatabaseForTesting[_i];
+            node.vote_pos = 0;
+            node.vote_neg = 0;
+            node.user = "gsanta";
             store.add(node);
           }
           return def.resolve();
@@ -287,6 +295,78 @@
             return removedUserFromIndexedDb(deferred);
           };
         }
+        return deferred.promise;
+      },
+      getUserVoteForNode: function(userName, nodeId) {
+        var deferred, loadUserVoteForNode, openRequest;
+        deferred = $q.defer();
+        loadUserVoteForNode = function(def) {
+          var cursor, store, transaction, vote;
+          transaction = db.transaction(["votes"], "readonly");
+          store = transaction.objectStore("votes");
+          cursor = store.openCursor();
+          vote = void 0;
+          cursor.onsuccess = function(e) {
+            var actVote;
+            actVote = e.target.result;
+            if (actVote != null) {
+              if (actVote.value.user === userName && actVote.value.node === nodeId) {
+                vote = actVote.value;
+                return vote.id = actVote.key;
+              } else {
+                return actVote["continue"]();
+              }
+            }
+          };
+          return transaction.oncomplete = function(e) {
+            return def.resolve(vote);
+          };
+        };
+        if (db) {
+          loadUserVoteForNode(deferred);
+        } else {
+          openRequest = openConnection();
+          openRequest.onsuccess = function(e) {
+            db = e.target.result;
+            return loadUserVoteForNode(deferred);
+          };
+        }
+        return deferred.promise;
+      },
+      setUserVoteForNode: function(userName, nodeId, vote) {
+        var promise, setUserVoteForNodeToIndexDb;
+        setUserVoteForNodeToIndexDb = function(def, data, isUpdate) {
+          var request, store, transaction;
+          transaction = db.transaction(["votes"], "readwrite");
+          store = transaction.objectStore("votes");
+          if (isUpdate) {
+            request = store.put(data, data.id);
+          } else {
+            request = store.add(data);
+          }
+          request.onsuccess = function(e) {
+            return def.resolve(data);
+          };
+          return request.onerror = function(e) {
+            return def.reject("problem with deleting user");
+          };
+        };
+        promise = factoryObj.getUserVoteForNode(userName, nodeId);
+        promise.then(function(data) {
+          var deferred;
+          deferred = $q.defer();
+          if (data != null) {
+            data.vote = vote;
+            return setUserVoteForNodeToIndexDb(deferred, data, true);
+          } else {
+            data = {
+              user: userName,
+              node: nodeId,
+              vote: vote
+            };
+            return setUserVoteForNodeToIndexDb(deferred, data, false);
+          }
+        });
         return deferred.promise;
       }
     };

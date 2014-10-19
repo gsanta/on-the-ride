@@ -2,8 +2,9 @@
 (function() {
   angular.module("controllers").controller('ProfileCtrl', function($scope, DataProvider, LoginService, UserService) {
     var promise;
-    promise = DataProvider.getUserInfo("gsanta");
+    promise = DataProvider.getUserInfo(LoginService.getSignedInUser());
     promise.then(function(data) {
+      console.log(data);
       $scope.user = data;
       return $scope.savedUser = angular.copy($scope.user);
     });

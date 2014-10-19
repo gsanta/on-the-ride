@@ -96,24 +96,16 @@ angular.module "controllers"
 
       $scope.map = new google.maps.Map document.querySelector( '#container-map-edit' ).querySelector( '#googleMap' ), Map.createMapProperties( centerCoordinates, 3 )
 
-      circles = Map.createPointsFromRoute data, $scope.map
+      circles = Map.createMarkersFromRoute data, $scope.map, $scope
 
-      # google.maps.event.addListener $scope.map, 'click', (e, attr) ->
-      #   console.log $scope.currentEditableCircle
-      #   if $scope.currentEditableCircle
-      #     $scope.currentEditableCircle.setDraggable false
-      #     $scope.currentEditableCircle = null
+      # for circle, index in circles
 
-      for circle, index in circles
-
-        dragEnd circle
-        dragStart circle
-        click circle
-        undefined
+      #   dragEnd circle
+      #   dragStart circle
+      #   click circle
+      #   undefined
 
   $scope.savePoints = ->
-    console.log "savePoints"
-    console.log $scope.editedCircles
     updateCircles = []
     addCircles = []
     for k,v of $scope.editedCircles

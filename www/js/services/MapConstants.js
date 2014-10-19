@@ -8,7 +8,7 @@
     latEnd: 30,
     lonEnd: 55,
     dbPrefix: "on_the_ride",
-    indexedDbVersion: 3
+    indexedDbVersion: 4
   });
 
 }).call(this);
