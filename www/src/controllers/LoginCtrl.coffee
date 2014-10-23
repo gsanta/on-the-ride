@@ -1,5 +1,5 @@
 angular.module "controllers"
-.controller 'LoginCtrl', ( $scope, $http, $timeout, LoginService ) ->
+.controller 'LoginCtrl', ( $scope, $http, $timeout, LoginService, $location ) ->
 
     $scope.form = undefined
 
@@ -27,3 +27,4 @@ angular.module "controllers"
 
     $scope.cancelForm = () ->
       LoginService.closeLoginDialog()
+      $location.path('/map')

@@ -1,54 +1,30 @@
 angular.module "controllers"
 .controller 'MapEditCtrl', ( $scope, $http, $timeout, Map, DataProvider,
-  LocalDataProviderService, Coord, LoginService ) ->
+  LocalDataProviderService, Coord, LoginService, MapConstants ) ->
 
   routePolyline = undefined
   canLoadMapAgain = true
 
-  newCircleId = -1
+  newNodeCounter = -1
 
-  dragStart = ( c ) ->
-    google.maps.event.addListener c, 'dragstart', ( e ) ->
-      console.log "start"
-      console.log $scope.editedCircles[ c._id ]
-      if $scope.editedCircles[ c._id ] == undefined
-        $scope.editedCircles.len++
-        console.log "len: " + $scope.editedCircles.len
-        $scope.editedCircles[ c._id ] = c
+  editedMarkers = []
+  markers = []
+  polylines = []
 
-        pointOptions =
-          strokeColor: '#ffff00',
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: '#ffff00',
-          fillOpacity: 0.35,
-          draggable: true,
-          map: c.map,
-          center: c.center
-          radius: c.radius
+  clearArray = ( array ) ->
+    for obj in array
+      obj.setMap null
+    #obj.setMap( null ) for obj in array
 
-        c.setOptions pointOptions
-
-      
-      $scope.currentEditableCircle = c
-      $scope.$apply()
-
-  dragEnd = ( c ) ->
-    google.maps.event.addListener c, 'dragend', ( e ) ->
-      $scope.currentEditableCircle = null
-      $scope.$apply() 
-
-  click = ( c ) ->
-    google.maps.event.addListener c, 'click', ( e ) ->
-      1
+  copyEditedMarkers = ( fromArray, toAssocArray ) ->
+    for obj in fromArray
+      if obj.nodeInfo.changed
+        toAssocArray[ obj.nodeInfo._id ] = obj
 
   $scope.routeInfo = undefined
   $scope.map = undefined
 
-  $scope.currentEditableCircle = undefined
-  $scope.editedCircles = {
-    len: 0
-  }
+  $scope.isThereEditedNode = false
 
   $scope.infoWindow = {
     isDisplayed: false
@@ -85,12 +61,28 @@ angular.module "controllers"
       #   console.log "most setMap"
       # $timeout callback, 6000
 
+  $scope.loadRouteInfo = ( ) ->
+    routeInfoPromise = LocalDataProviderService.loadRouteInfo()
+
+    routeInfoPromise.then ( data ) ->
+      $scope.routeInfo = data
+      window.routeInfo = data
+
+      copyEditedMarkers markers, editedMarkers
+      clearArray markers
+      markers = []
+      clearArray polylines
+      polylines = []
+
+      if $scope.isEdit && MapConstants.maxZoom == $scope.map.zoom
+        markers = Map.createMarkersFromRoute data, $scope.map, $scope
+      else
+        polylines.push Map.createPolylineFromRoute data, $scope.map
+
+  $scope.isEdit = true
 
   $scope.initMap = ->
-    # DataProvider.loadMapArea( 0 ).success ( data ) ->
-    #   console.log "loadMapArea"
-    #   console.log data
-    window.$scope = $scope
+    window.routeInfo = $scope.routeInfo
     routeInfoPromise = LocalDataProviderService.loadRouteInfo()#Map.fetchRouteNodes( 1, [ 0 ] )
 
     routeInfoPromise.then ( data ) ->
@@ -100,51 +92,33 @@ angular.module "controllers"
 
       $scope.map = new google.maps.Map document.querySelector( '#container-map-edit' ).querySelector( '#googleMap' ), Map.createMapProperties( centerCoordinates, 3 )
 
-      circles = Map.createMarkersFromRoute data, $scope.map, $scope
+      polylines.push Map.createPolylineFromRoute data, $scope.map
 
-      # for circle, index in circles
-
-      #   dragEnd circle
-      #   dragStart circle
-      #   click circle
-      #   undefined
-
+      google.maps.event.addListener $scope.map,'zoom_changed', () ->
+        $scope.loadRouteInfo()
+  
   $scope.savePoints = ->
-    updateCircles = []
-    addCircles = []
-    for k,v of $scope.editedCircles
-      if k != "len"
-        pointOptions =
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: '#FF0000',
-          fillOpacity: 0.35,
-          draggable: true,
-          map: v.map,
-          center: v.center
-          radius: v.radius
-        v.setOptions pointOptions
+    updateNodes = []
+    addNodes = []
+    copyEditedMarkers markers, editedMarkers
+    for k,v of editedMarkers
+      if v.nodeInfo._id < 0
+        addNodes.push v.nodeInfo
+      else
+        updateNodes.push v.nodeInfo
 
-        if v._id < 0
-          addCircles.push v
-        else
-          updateCircles.push v
+    Map.savePoints updateNodes
+    Map.addPoints addNodes
 
-
-
-    Map.savePoints updateCircles
-    Map.addPoints addCircles
-    $scope.currentEditableCircle = null
-    $scope.editedCircles = {
-      len: 0
-    }
+    $scope.isThereEditedNode = false
 
   $scope.addPoint = ->
-    circle = Map.addPointToCenterOfMap $scope.map
-    circle._id = newCircleId--
-    dragStart circle
-    dragEnd circle
+    marker = Map.addNewPointToCenterOfMap $scope.map, $scope
+    marker.nodeInfo._id = newNodeCounter
+    $scope.isThereEditedNode = true
+    newNodeCounter--
+    editedMarkers.push marker
+    markers.push marker 
 
   $scope.infoBoxes = []
 
@@ -164,7 +138,7 @@ angular.module "controllers"
     if( !$scope.vote.isReset && newValue != oldValue )
       console.log "send: #{oldValue},#{newValue}, #{$scope.vote.isReset}"
       user = LoginService.getUserName()
-      nodeId = $scope.actNode._id
+      nodeId = $scope.actNode._id #todo nodeInfo._id???
       Map.sendUserVoteForNode user, nodeId, newValue
     $scope.vote.isReset = false
   )

@@ -7,5 +7,6 @@ angular.module "services"
   latEnd: 30,
   lonEnd: 55,
   dbPrefix: "on_the_ride",
+  maxZoom: 15,
   indexedDbVersion: 5
 }

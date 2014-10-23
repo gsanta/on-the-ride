@@ -3,8 +3,38 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module("services").factory("Map", function(DataProvider, LocalDataProviderService, MapConstants, Coord, $compile, LoginService, $http, $q) {
-    var factoryObj, mapZoomDiameterSquares;
+    var addClickEventToMarker, addDragendEventToMarker, factoryObj, infoWindowContent, infowindow, mapZoomDiameterSquares;
     mapZoomDiameterSquares = [5825, 1456.25, 364.0625, 91.016, 22.754, 5.691, 1.422, 0.3557, 0.0892];
+    infoWindowContent = '<div>\n  <div class="list">\n      <div class="item item-divider">\n        Basic info\n      </div>\n\n      <div class="item"> \n        User: {{actNode.user}}<br/>\n        Id: {{actNode.lat}}\n      </div>\n\n      <div class="item item-divider">\n        How accurate this point is?\n      </div>\n\n      <div class="item range range-energized"> \n        <div> \n        <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote.value">\n        </div>\n        <div>\n          <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>\n          <i class="icon ion-sad">&nbsp;{{actNode.vote_neg}}</i>\n        </div>\n      </div>\n  </div>\n</div>\n';
+    infowindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(infowindow, 'closeclick', function() {});
+    addClickEventToMarker = function(marker, scope, node, content, googleMap) {
+      return google.maps.event.addListener(marker, 'click', function() {
+        var allVotesPromise, nodeId, userVotePromise;
+        nodeId = parseInt(node._id);
+        userVotePromise = factoryObj.getUserVoteToPoint(LoginService.getUserName(), nodeId);
+        allVotesPromise = factoryObj.getAllVotesToNode(nodeId);
+        scope.actNode = node;
+        allVotesPromise.then(function(data) {
+          scope.actNode.vote_pos = data.pos;
+          return scope.actNode.vote_neg = data.neg;
+        });
+        userVotePromise.then(function(data) {
+          return scope.vote.value = data.vote;
+        });
+        scope.$apply();
+        infowindow.setContent(content);
+        return infowindow.open(googleMap, marker);
+      });
+    };
+    addDragendEventToMarker = function(marker, scope) {
+      return google.maps.event.addListener(marker, 'dragend', function(event) {
+        marker.nodeInfo.changed = true;
+        marker.nodeInfo.lat = event.latLng.k;
+        marker.nodeInfo.lon = event.latLng.B;
+        return scope.isThereEditedNode = true;
+      });
+    };
     factoryObj = {
       calculateZoom: function(topLeftCoord, bottomRightCoord) {
         var actDistanceSquare, dist, index, lat1, lat2, lon1, lon2, _i, _len;
@@ -101,7 +131,7 @@
         }
         return void 0;
       },
-      createPolylineFromRoute: function(route) {
+      createPolylineFromRoute: function(route, googleMap) {
         var coordinates, node, routePolyline, _i, _len;
         coordinates = [];
         for (_i = 0, _len = route.length; _i < _len; _i++) {
@@ -113,7 +143,8 @@
           geodesic: true,
           strokeColor: '#FF0000',
           strokeOpacity: 1.0,
-          strokeWeight: 2
+          strokeWeight: 2,
+          map: googleMap
         });
         return routePolyline;
       },
@@ -140,12 +171,10 @@
         return circles;
       },
       createMarkersFromRoute: function(route, googleMap, scope) {
-        var compiled, content, index, infowindow, marker, markerOptions, markers, node, _i, _len;
+        var compiled, index, marker, markerOptions, markers, node, _i, _len;
         markers = [];
-        content = '<div>\n  <div class="list">\n      <div class="item item-divider">\n        Basic info\n      </div>\n\n      <div class="item"> \n        User: {{actNode.user}}\n      </div>\n\n      <div class="item item-divider">\n        How accurate this point is?\n      </div>\n\n      <div class="item range range-energized"> \n        <div> \n        <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote.value">\n        </div>\n        <div>\n          <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>\n          <i class="icon ion-sad">&nbsp;{{actNode.vote_neg}}</i>\n        </div>\n      </div>\n  </div>\n</div>\n';
-        compiled = $compile(content)(scope);
+        compiled = $compile(infoWindowContent)(scope);
         scope.markers = markers;
-        infowindow = new google.maps.InfoWindow();
         for (index = _i = 0, _len = route.length; _i < _len; index = ++_i) {
           node = route[index];
           markerOptions = {
@@ -155,51 +184,35 @@
             position: new google.maps.LatLng(node.lat, node.lon)
           };
           marker = new google.maps.Marker(markerOptions);
-          marker._id = node._id;
+          marker.nodeInfo = node;
           markers.push(marker);
-          google.maps.event.addListener(marker, 'click', (function(marker, compiled, scope, node) {
-            return function() {
-              var allVotesPromise, nodeId, userVotePromise;
-              nodeId = parseInt(node._id);
-              userVotePromise = factoryObj.getUserVoteToPoint(LoginService.getUserName(), nodeId);
-              allVotesPromise = factoryObj.getAllVotesToNode(nodeId);
-              scope.actNode = node;
-              allVotesPromise.then(function(data) {
-                scope.actNode.vote_pos = data.pos;
-                return scope.actNode.vote_neg = data.neg;
-              });
-              userVotePromise.then(function(data) {
-                return scope.vote.value = data.vote;
-              });
-              scope.$apply();
-              infowindow.setContent(compiled[0]);
-              return infowindow.open(googleMap, marker);
-            };
-          })(marker, compiled, scope, node));
+          addClickEventToMarker(marker, scope, node, compiled[0], googleMap);
+          addDragendEventToMarker(marker, scope);
         }
-        google.maps.event.addListener(infowindow, 'closeclick', function() {
-          scope.vote.isReset = true;
-          scope.vote.value = 1;
-          return scope.$apply();
-        });
         return markers;
       },
-      addPointToCenterOfMap: function(googleMap) {
-        var circle, pointOptions;
-        pointOptions = {
-          strokeColor: '#00FF00',
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: '#00FF00',
-          fillOpacity: 0.35,
-          draggable: true,
+      addNewPointToCenterOfMap: function(googleMap, scope) {
+        var compiled, marker, markerOptions;
+        compiled = $compile(infoWindowContent)(scope);
+        markerOptions = {
           map: googleMap,
-          center: googleMap.getCenter(),
-          radius: (Math.random() * 10) + 10
+          draggable: true,
+          animation: google.maps.Animation.DROP,
+          position: googleMap.getCenter()
         };
-        circle = new google.maps.Circle(pointOptions);
-        circle._id = -1;
-        return circle;
+        marker = new google.maps.Marker(markerOptions);
+        marker.nodeInfo = {
+          user: LoginService.getUserName(),
+          vote_pos: 0,
+          vote_neg: 0,
+          changed: true,
+          lat: 0,
+          lon: 0,
+          _id: -1
+        };
+        addClickEventToMarker(marker, scope, marker.nodeInfo, compiled[0], googleMap);
+        addDragendEventToMarker(marker, scope);
+        return marker;
       },
       createCoordinate: function(lat, lon) {
         return new google.maps.LatLng(lat, lon);
@@ -251,26 +264,26 @@
         }
         return ids;
       },
-      savePoints: function(circles) {
-        var circle, _i, _len, _results;
+      savePoints: function(nodes) {
+        var node, _i, _len, _results;
         _results = [];
-        for (_i = 0, _len = circles.length; _i < _len; _i++) {
-          circle = circles[_i];
-          _results.push(LocalDataProviderService.updateNode(circle._id, {
-            lat: circle.center.lat(),
-            lon: circle.center.lng()
+        for (_i = 0, _len = nodes.length; _i < _len; _i++) {
+          node = nodes[_i];
+          _results.push(LocalDataProviderService.updateNode(node._id, {
+            lat: node.lat,
+            lon: node.lon
           }));
         }
         return _results;
       },
-      addPoints: function(circles) {
-        var circle, _i, _len, _results;
+      addPoints: function(nodes) {
+        var node, _i, _len, _results;
         _results = [];
-        for (_i = 0, _len = circles.length; _i < _len; _i++) {
-          circle = circles[_i];
+        for (_i = 0, _len = nodes.length; _i < _len; _i++) {
+          node = nodes[_i];
           _results.push(LocalDataProviderService.addNode({
-            lat: circle.center.lat(),
-            lon: circle.center.lng()
+            lat: node.lat,
+            lon: node.lon
           }));
         }
         return _results;

@@ -13,6 +13,72 @@ angular.module "services"
     0.0892
   ]
 
+  infoWindowContent = '''
+      <div>
+        <div class="list">
+            <div class="item item-divider">
+              Basic info
+            </div>
+
+            <div class="item"> 
+              User: {{actNode.user}}<br/>
+              Id: {{actNode.lat}}
+            </div>
+
+            <div class="item item-divider">
+              How accurate this point is?
+            </div>
+
+            <div class="item range range-energized"> 
+              <div> 
+              <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote.value">
+              </div>
+              <div>
+                <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>
+                <i class="icon ion-sad">&nbsp;{{actNode.vote_neg}}</i>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      '''
+
+  infowindow = new google.maps.InfoWindow()
+
+  google.maps.event.addListener infowindow, 'closeclick', () ->
+    # scope.vote.isReset = true
+    # scope.vote.value = 1
+    # scope.$apply()
+
+  addClickEventToMarker = (marker, scope, node, content, googleMap) ->
+
+    google.maps.event.addListener marker, 'click', () ->
+      nodeId = parseInt node._id
+      userVotePromise = factoryObj.getUserVoteToPoint( LoginService.getUserName(), nodeId )
+      allVotesPromise = factoryObj.getAllVotesToNode nodeId
+
+      scope.actNode = node
+      
+      allVotesPromise.then ( data ) ->
+        scope.actNode.vote_pos = data.pos
+        scope.actNode.vote_neg = data.neg
+
+      userVotePromise.then ( data ) ->
+        #scope.vote.isReset = true
+        scope.vote.value = data.vote
+      
+      scope.$apply()
+
+      infowindow.setContent content
+      infowindow.open googleMap, marker
+
+  addDragendEventToMarker = ( marker, scope ) ->
+    google.maps.event.addListener marker, 'dragend', ( event ) ->
+      marker.nodeInfo.changed = true
+      marker.nodeInfo.lat = event.latLng.k
+      marker.nodeInfo.lon = event.latLng.B
+      scope.isThereEditedNode = true
+
   factoryObj =
 
     calculateZoom: ( topLeftCoord, bottomRightCoord ) ->
@@ -96,7 +162,7 @@ angular.module "services"
           return  node
       undefined
 
-    createPolylineFromRoute: ( route ) ->
+    createPolylineFromRoute: ( route, googleMap ) ->
       coordinates = []
       coordinates.push new google.maps.LatLng node.lat, node.lon for node in route
 
@@ -105,7 +171,8 @@ angular.module "services"
         geodesic: true,
         strokeColor: '#FF0000',
         strokeOpacity: 1.0,
-        strokeWeight: 2
+        strokeWeight: 2,
+        map: googleMap
       }
 
       return routePolyline
@@ -135,39 +202,9 @@ angular.module "services"
 
       markers = []
 
-      content = '''
-      <div>
-        <div class="list">
-            <div class="item item-divider">
-              Basic info
-            </div>
-
-            <div class="item"> 
-              User: {{actNode.user}}
-            </div>
-
-            <div class="item item-divider">
-              How accurate this point is?
-            </div>
-
-            <div class="item range range-energized"> 
-              <div> 
-              <input type="range" name="volume" min="0" max="2" value="1" ng-model="vote.value">
-              </div>
-              <div>
-                <i class="icon ion-happy">&nbsp;{{actNode.vote_pos}}</i>
-                <i class="icon ion-sad">&nbsp;{{actNode.vote_neg}}</i>
-              </div>
-            </div>
-        </div>
-      </div>
-
-      '''
-      compiled = $compile(content)(scope);
+      compiled = $compile(infoWindowContent)(scope);
 
       scope.markers = markers
-
-      infowindow = new google.maps.InfoWindow()
 
       for node, index in route
         markerOptions =
@@ -177,54 +214,41 @@ angular.module "services"
           position: new google.maps.LatLng node.lat, node.lon
 
         marker = new google.maps.Marker markerOptions
-        marker._id = node._id
+        marker.nodeInfo = node
 
         markers.push marker
 
-        google.maps.event.addListener marker, 'click', ((marker, compiled, scope, node) ->
-          return () ->
-            nodeId = parseInt node._id
-            userVotePromise = factoryObj.getUserVoteToPoint( LoginService.getUserName(), nodeId )
-            allVotesPromise = factoryObj.getAllVotesToNode nodeId
-
-            scope.actNode = node
-            
-            allVotesPromise.then ( data ) ->
-              scope.actNode.vote_pos = data.pos
-              scope.actNode.vote_neg = data.neg
-
-            userVotePromise.then ( data ) ->
-              #scope.vote.isReset = true
-              scope.vote.value = data.vote
-            
-            scope.$apply()
-            infowindow.setContent compiled[0] 
-            infowindow.open googleMap, marker
-        )( marker, compiled, scope, node )
-
-      google.maps.event.addListener infowindow, 'closeclick', () ->
-        scope.vote.isReset = true
-        scope.vote.value = 1
-        scope.$apply()
+        addClickEventToMarker( marker, scope, node, compiled[0], googleMap ) 
+        addDragendEventToMarker( marker, scope )
 
       markers
 
-    addPointToCenterOfMap: ( googleMap ) ->
+    addNewPointToCenterOfMap: ( googleMap, scope ) ->
 
-      pointOptions =
-        strokeColor: '#00FF00',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#00FF00',
-        fillOpacity: 0.35,
-        draggable: true,
+      compiled = $compile( infoWindowContent )( scope )
+
+      markerOptions =
         map: googleMap,
-        center: googleMap.getCenter()
-        radius: ( Math.random() * 10 ) + 10
+        draggable: true,
+        animation: google.maps.Animation.DROP,
+        position: googleMap.getCenter() 
 
-      circle = new google.maps.Circle pointOptions 
-      circle._id = -1
-      circle
+      marker = new google.maps.Marker markerOptions
+
+      marker.nodeInfo = {
+        user: LoginService.getUserName(),
+        vote_pos: 0,
+        vote_neg: 0,
+        changed: true,
+        lat: 0,#todo get lat from getCenter()
+        lon: 0,#todo get lon from getCenter()
+        _id: -1
+      }
+
+      addClickEventToMarker( marker, scope, marker.nodeInfo, compiled[0], googleMap ) 
+      addDragendEventToMarker( marker, scope )
+
+      marker
 
     createCoordinate: ( lat, lon ) ->
       new google.maps.LatLng lat,lon
@@ -278,19 +302,20 @@ angular.module "services"
         ids.push parseInt k, 10
       ids
 
-    savePoints: ( circles ) ->
+    #todo put marker._id into marker.nodeInfo._id
+    savePoints: ( nodes ) ->
 
-      for circle in circles
-        LocalDataProviderService.updateNode circle._id, {
-          lat: circle.center.lat(),
-          lon: circle.center.lng()
+      for node in nodes
+        LocalDataProviderService.updateNode node._id, {
+          lat: node.lat,
+          lon: node.lon
         }
 
-    addPoints: ( circles ) ->
-      for circle in circles
+    addPoints: ( nodes ) ->
+      for node in nodes
         LocalDataProviderService.addNode {
-          lat: circle.center.lat(),
-          lon: circle.center.lng()
+          lat: node.lat,
+          lon: node.lon
         }
 
     getUserVoteToPoint: ( userName, nodeId ) ->

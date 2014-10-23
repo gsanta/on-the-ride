@@ -445,29 +445,6 @@ window.smallDatabaseForTesting = [
         "startNodeInMap": []
     },
     {
-        "_id": 25472,
-        "lat": "47.8787627",
-        "lon": "1.8384324",
-        "siblings": [
-            25473,
-            25474,
-            25475
-        ],
-        "weight": 3,
-        "mapIds": [
-            0,
-            3,
-            13,
-            54,
-            215,
-            890,
-            3616,
-            14444,
-            57987
-        ],
-        "startNodeInMap": []
-    },
-    {
         "_id": 15,
         "lat": "47.5899205",
         "lon": "7.5873644",
@@ -2291,30 +2268,6 @@ window.smallDatabaseForTesting = [
             3622,
             14583,
             58522
-        ],
-        "startNodeInMap": []
-    },
-    {
-        "_id": 25471,
-        "lat": "47.8789721",
-        "lon": "1.8383263",
-        "siblings": [
-            25472,
-            25473,
-            25474,
-            25475
-        ],
-        "weight": 2,
-        "mapIds": [
-            0,
-            3,
-            13,
-            54,
-            215,
-            890,
-            3616,
-            14444,
-            57987
         ],
         "startNodeInMap": []
     },
