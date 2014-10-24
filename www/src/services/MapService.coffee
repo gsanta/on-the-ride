@@ -221,6 +221,7 @@ angular.module "services"
         addClickEventToMarker( marker, scope, node, compiled[0], googleMap ) 
         addDragendEventToMarker( marker, scope )
 
+      console.log markers
       markers
 
     addNewPointToCenterOfMap: ( googleMap, scope ) ->
@@ -240,8 +241,8 @@ angular.module "services"
         vote_pos: 0,
         vote_neg: 0,
         changed: true,
-        lat: 0,#todo get lat from getCenter()
-        lon: 0,#todo get lon from getCenter()
+        lat: googleMap.getCenter().k,
+        lon: googleMap.getCenter().B,
         _id: -1
       }
 
@@ -314,6 +315,7 @@ angular.module "services"
     addPoints: ( nodes ) ->
       for node in nodes
         LocalDataProviderService.addNode {
+          user: node.user,
           lat: node.lat,
           lon: node.lon
         }

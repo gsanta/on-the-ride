@@ -1,5 +1,5 @@
 angular.module 'services'
-.factory 'LoginService', ( $http, $q, $location, SecurityRetryQueue, $ionicPopup, $rootScope, $timeout ) ->
+.factory 'LoginService', ( $http, $q, $location, SecurityRetryQueue, $ionicPopup, $rootScope, $timeout, $window ) ->
 
 
   $scope = $rootScope.$new() 
@@ -104,7 +104,7 @@ angular.module 'services'
 
     logout: () ->
       sessionStorage.removeItem( "userName" )
-      $location.path('/newValue')
+      $window.location.href = "/map"
 
     showLoginDialog: () ->
       $scope.openLoginDialog()

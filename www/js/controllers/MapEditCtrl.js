@@ -63,7 +63,7 @@
         markers = [];
         clearArray(polylines);
         polylines = [];
-        if ($scope.isEdit && MapConstants.maxZoom === $scope.map.zoom) {
+        if ($scope.isEdit && MapConstants.maxZoom === $scope.map.zoom && LoginService.isLoggedIn()) {
           return markers = Map.createMarkersFromRoute(data, $scope.map, $scope);
         } else {
           return polylines.push(Map.createPolylineFromRoute(data, $scope.map));
@@ -79,7 +79,7 @@
         var centerCoordinates;
         $scope.routeInfo = data;
         centerCoordinates = Map.createCoordinate(data[0].lat, data[0].lon);
-        $scope.map = new google.maps.Map(document.querySelector('#container-map-edit').querySelector('#googleMap'), Map.createMapProperties(centerCoordinates, 3));
+        $scope.map = new google.maps.Map(document.querySelector('#container-map-edit').querySelector('#googleMap'), Map.createMapProperties(centerCoordinates, 13));
         polylines.push(Map.createPolylineFromRoute(data, $scope.map));
         return google.maps.event.addListener($scope.map, 'zoom_changed', function() {
           return $scope.loadRouteInfo();

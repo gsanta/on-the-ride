@@ -189,6 +189,7 @@
           addClickEventToMarker(marker, scope, node, compiled[0], googleMap);
           addDragendEventToMarker(marker, scope);
         }
+        console.log(markers);
         return markers;
       },
       addNewPointToCenterOfMap: function(googleMap, scope) {
@@ -206,8 +207,8 @@
           vote_pos: 0,
           vote_neg: 0,
           changed: true,
-          lat: 0,
-          lon: 0,
+          lat: googleMap.getCenter().k,
+          lon: googleMap.getCenter().B,
           _id: -1
         };
         addClickEventToMarker(marker, scope, marker.nodeInfo, compiled[0], googleMap);
@@ -282,6 +283,7 @@
         for (_i = 0, _len = nodes.length; _i < _len; _i++) {
           node = nodes[_i];
           _results.push(LocalDataProviderService.addNode({
+            user: node.user,
             lat: node.lat,
             lon: node.lon
           }));
