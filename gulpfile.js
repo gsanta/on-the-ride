@@ -11,6 +11,8 @@ var coffee = require('gulp-coffee');
 var karma = require('karma').server;
 var coffeelint = require("gulp-coffeelint");
 var connect = require('gulp-connect');
+var coffeeify = require('gulp-coffeeify');
+var browserify = require('gulp-browserify');
 
 var paths = {
   sass: ['./scss/**/*.scss']
@@ -32,8 +34,8 @@ gulp.task('sass', function(done) {
 
 gulp.task('watch', function() {
   gulp.watch(paths.sass, ['sass']);
-  gulp.watch('www/src/**/*.coffee', ['coffeeLint', 'coffee'])
-  gulp.watch(['www/js/**/*.js', 'tests/**/*.js'], ['test'])
+  gulp.watch('www/src/**/*.coffee', ['coffeeLint', 'coffeeify'])
+  // gulp.watch(['www/js/**/*.js', 'tests/**/*.js'], ['test'])
 });
 
 gulp.task('install', ['git-check'], function() {
@@ -85,4 +87,16 @@ gulp.task('connect', function() {
     port: 8001,
     livereload: true
   });
+});
+
+gulp.task('coffeeify', function() {
+
+  gulp.src('www/src/app.coffee', { read: false })
+  .pipe(browserify({
+    transform: ['coffeeify'],
+    extensions: ['.coffee'],
+    debug: true
+  }))
+  .pipe(rename('app.js'))
+  .pipe(gulp.dest('www/js'))
 });

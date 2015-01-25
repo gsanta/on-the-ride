@@ -1,5 +1,4 @@
-angular.module 'services'
-.factory 'LocalDataProviderService', ( $http, $q, MapConstants ) ->
+LocalDataProviderService = ( $http, $q, MapConstants ) ->
 
   idbSupported = false
   if "indexedDB" in window
@@ -376,3 +375,5 @@ angular.module 'services'
 
 
   factoryObj
+
+module.exports = LocalDataProviderService

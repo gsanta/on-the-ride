@@ -1,5 +1,4 @@
-angular.module 'services'
-.factory 'DataProvider', ( $http, $q ) ->
+DataProviderService = ( $http, $q ) ->
   
   factoryObj =
   
@@ -32,3 +31,5 @@ angular.module 'services'
 
 
   factoryObj
+
+module.exports = DataProviderService

@@ -1,3 +1,22 @@
+
+servicesModule = angular.module "services", []
+classesModule = angular.module "classes", []
+directivesModule = angular.module "directives", []
+controllersModule = angular.module "controllers", [ "services", "directives" ]
+
+require('./services')
+require('./dao')
+require('./editor')
+require('./map_builder')
+require('./map_calculation')
+require('./misc')
+require('./profile')
+require('./security') 
+
+
+servicesModule.config ( $httpProvider ) ->
+  $httpProvider.responseInterceptors.push 'SecurityInterceptor'
+
 angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes', 'directives', 'ui.gravatar' ]
 .run ( $ionicPlatform, $rootScope, $location, LoginService ) ->
 
@@ -87,7 +106,7 @@ angular.module 'starter', [ 'ionic', 'controllers', 'services', 'classes', 'dire
       }
     })
 
-    .state('loginTemp', {
+    .state('loginTemp', { 
       url: "/loginTemp",
       templateUrl: 'templates/login.html',
       controller: 'LoginCtrl',
