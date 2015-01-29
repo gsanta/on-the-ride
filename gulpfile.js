@@ -89,14 +89,12 @@ gulp.task('connect', function() {
   });
 });
 
-gulp.task('coffeeify', function() {
+gulp.task('browserify', function() {
 
-  gulp.src('www/src/app.coffee', { read: false })
+  gulp.src('www/js/app.js', { read: false })
   .pipe(browserify({
-    transform: ['coffeeify'],
-    extensions: ['.coffee'],
     debug: true
   }))
-  .pipe(rename('app.js'))
+  .pipe(rename('build.js'))
   .pipe(gulp.dest('www/js'))
 });

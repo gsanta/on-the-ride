@@ -1,39 +1,35 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function() {
-  var BicycleRouteBuilderService, factoryObj;
+var BicycleRouteBuilderService;
 
-  BicycleRouteBuilderService = function(InfoWindowService) {
-    var addClickEventToMarker, addDragendEventToMarker;
-    addClickEventToMarker = function(marker, scope, node, content, googleMap) {
-      return google.maps.event.addListener(marker, 'click', function() {
-        var allVotesPromise, nodeId, userVotePromise;
-        nodeId = parseInt(node._id);
-        userVotePromise = factoryObj.getUserVoteToPoint(LoginService.getUserName(), nodeId);
-        allVotesPromise = factoryObj.getAllVotesToNode(nodeId);
-        scope.actNode = node;
-        allVotesPromise.then(function(data) {
-          scope.actNode.vote_pos = data.pos;
-          return scope.actNode.vote_neg = data.neg;
-        });
-        userVotePromise.then(function(data) {
-          return scope.vote.value = data.vote;
-        });
-        scope.$apply();
-        InfoWindowService.getInfoWindow().setContent(content);
-        return InfoWindowService.getInfoWindow().open(googleMap, marker);
+BicycleRouteBuilderService = function(InfoWindowService) {
+  var addClickEventToMarker, addDragendEventToMarker, factoryObj;
+  addClickEventToMarker = function(marker, scope, node, content, googleMap) {
+    return google.maps.event.addListener(marker, 'click', function() {
+      var allVotesPromise, nodeId, userVotePromise;
+      nodeId = parseInt(node._id);
+      userVotePromise = factoryObj.getUserVoteToPoint(LoginService.getUserName(), nodeId);
+      allVotesPromise = factoryObj.getAllVotesToNode(nodeId);
+      scope.actNode = node;
+      allVotesPromise.then(function(data) {
+        scope.actNode.vote_pos = data.pos;
+        return scope.actNode.vote_neg = data.neg;
       });
-    };
-    return addDragendEventToMarker = function(marker, scope) {
-      return google.maps.event.addListener(marker, 'dragend', function(event) {
-        marker.nodeInfo.changed = true;
-        marker.nodeInfo.lat = event.latLng.k;
-        marker.nodeInfo.lon = event.latLng.B;
-        return scope.isThereEditedNode = true;
+      userVotePromise.then(function(data) {
+        return scope.vote.value = data.vote;
       });
-    };
+      scope.$apply();
+      InfoWindowService.getInfoWindow().setContent(content);
+      return InfoWindowService.getInfoWindow().open(googleMap, marker);
+    });
   };
-
-  factoryObj = {
+  addDragendEventToMarker = function(marker, scope) {
+    return google.maps.event.addListener(marker, 'dragend', function(event) {
+      marker.nodeInfo.changed = true;
+      marker.nodeInfo.lat = event.latLng.k;
+      marker.nodeInfo.lon = event.latLng.B;
+      return scope.isThereEditedNode = true;
+    });
+  };
+  return factoryObj = {
     createPolylineFromRoute: function(route, googleMap) {
       var coordinates, node, routePolyline, _i, _len;
       coordinates = [];
@@ -119,11 +115,6 @@
       });
     }
   };
+};
 
-  factoryObj;
-
-  module.exports = BicycleRouteBuilderService;
-
-}).call(this);
-
-},{}]},{},[1])
+module.exports = BicycleRouteBuilderService;

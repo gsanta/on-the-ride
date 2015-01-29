@@ -1,65 +1,22 @@
-<ion-side-menus ng-controller="MapEditCtrl">
-  <ion-side-menu-content>
-    <ion-header-bar class="bar-energized">
-      <button class="button button-icon icon ion-navicon-round"
-        menu-toggle="left"
-        ></button>
+<ion-side-menu-content>
+  <ion-header-bar class="bar-energized">
+    <button class="button button-icon icon ion-navicon-round"
+      menu-toggle="left"
+      ></button>
 
-      <img gravatar-src="'{{profile.email}}'" gravatar-size="40" ng-if="security.isLoggedIn()">
-      <span ng-hide="security.isLoggedIn()">Logged out</span>
+    <img gravatar-src="'{{profile.email}}'" gravatar-size="40" ng-if="security.isLoggedIn()">
+    <span ng-hide="security.isLoggedIn()">Logged out</span>
 
 
-      <h1 class="title">Map</h1>
-      <button ng-show="security.isLoggedIn()" class="button button-icon icon ion-navicon-round"
-        menu-toggle="right"
-        ></button>
-    </ion-header-bar>
-    <ion-content  ng-init="initMap()" id="container-map-edit">
-      <!--Lat: {{currentEditableCircle.center.lat()}}, Lon: {{currentEditableCircle.center.lng()}}-->      
-      <div class="google-maps-wrapper ">
-        <div id="googleMap" class="google-maps">
-        </div>
+    <h1 class="title">Map</h1>
+    <button ng-show="security.isLoggedIn()" class="button button-icon icon ion-navicon-round"
+      menu-toggle="right"
+      ></button>
+  </ion-header-bar>
+  <ion-content  ng-init="initMap()" id="container-map-edit">   
+    <div class="google-maps-wrapper ">
+      <div id="googleMap" class="google-maps">
       </div>
-    </ion-content>
-  </ion-side-menu-content>
-  <ion-side-menu side="left">
-    <ion-list class="navigation">
-      <ion-item nav-clear menu-close href="#/map" class="app-item-active">
-        Map
-      </ion-item>
-      <ion-item nav-clear menu-close href="#/profile">
-        Profile
-      </ion-item>
-      <ion-item ng-click="security.login()" ng-hide="security.isLoggedIn()">
-        Log in
-      </ion-item>
-      <ion-item ng-click="security.signUp()" ng-hide="security.isLoggedIn()">
-        Sign up
-      </ion-item>
-      <ion-item ng-click="security.logout()" ng-show="security.isLoggedIn()">
-        Log out
-      </ion-item>
-    </ion-list>
-  </ion-side-menu>
-  <ion-side-menu side="right" ng-show="security.isLoggedIn()">
-    <ion-list>
-        <li class="item item-toggle">
-          Edit map
-          <label class="toggle toggle-energized">
-            <input type="checkbox" ng-model="isEdit">
-            <div class="track">
-              <div class="handle"></div>
-            </div>
-          </label>
-        </li>
-      <ion-item ng-show="isEdit">
-        <button class="button button-energized button-block" ng-click="addPoint()">
-          Add new point
-        </button>
-        <button class="button button-energized button-block" ng-disabled="!isThereEditedNode" ng-click="savePoints()">
-          Save changes
-        </button>
-      </ion-item>
-    </ion-list>
-  </ion-side-menu>
-</ion-side-menus>
+    </div>
+  </ion-content>
+</ion-side-menu-content>
