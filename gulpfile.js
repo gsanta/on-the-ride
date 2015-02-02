@@ -98,3 +98,30 @@ gulp.task('browserify', function() {
   .pipe(rename('build.js'))
   .pipe(gulp.dest('www/js'))
 });
+
+// /*
+//  * Watch applications and their dependencies for changes and automatically rebuild them.  This will keep build times small since
+//  * we don't have to manually rebuild all applications everytime we make even the smallest/most isolated of changes. 
+//  */
+// gulp.task("autobuild", function() {
+//     return gulp.src(APPS_GLOB)
+//         .pipe(forEach(function(stream, file) {
+//             // Get our bundler just like in the "build" task, but wrap it with watchify and use the watchify default args (options).
+//             var bundler = watchify(getBundler(file, watchify.args));
+            
+//             function rebundle() {
+//                 // When an automatic build happens, create a flag file so that we can prevent committing these bundles because of
+//                 // the full paths that they have to include.  A Git pre-commit hook will look for and block commits if this file exists.
+//                 // A manual build is require before bundled assets can be committed as it will remove this flag file.
+//                 shell.exec("touch " + AUTOBUILD_FLAG_FILE);
+                
+//                 return bundle(file, bundler);
+//             }
+            
+//             // Whenever the application or its dependencies are modified, automatically rebundle the application.
+//             bundler.on("update", rebundle);
+ 
+//             // Rebundle this application now.            
+//             return rebundle();
+//         }));
+// });

@@ -9,7 +9,8 @@ MapConstants = {
   lonEnd: 55,
   dbPrefix: "on_the_ride",
   maxZoom: 15,
-  indexedDbVersion: 5
+  indexedDbVersion: 5,
+  iDBRouteStoreName: "route0"
 };
 
 module.exports = MapConstants;

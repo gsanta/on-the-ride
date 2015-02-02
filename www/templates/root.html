@@ -1,0 +1,43 @@
+<ion-side-menus>
+  <ion-nav-view></ion-nav-view>
+  <ion-side-menu side="left">
+    <ion-list class="navigation">
+      <ion-item nav-clear menu-close href="#/map" class="app-item-active">
+        Map
+      </ion-item>
+      <ion-item nav-clear menu-close href="#/profile">
+        Profile
+      </ion-item>
+      <ion-item ng-click="security.login()" ng-hide="security.isLoggedIn()">
+        Log in
+      </ion-item>
+      <ion-item ng-click="security.signUp()" ng-hide="security.isLoggedIn()">
+        Sign up
+      </ion-item>
+      <ion-item ng-click="security.logout()" ng-show="security.isLoggedIn()">
+        Log out
+      </ion-item>
+    </ion-list>
+  </ion-side-menu>
+  <ion-side-menu side="right" ng-show="security.isLoggedIn()">
+    <ion-list>
+        <li class="item item-toggle">
+          Edit map
+          <label class="toggle toggle-energized">
+            <input type="checkbox" ng-model="isEdit">
+            <div class="track">
+              <div class="handle"></div>
+            </div>
+          </label>
+        </li>
+      <ion-item ng-show="isEdit">
+        <button class="button button-energized button-block" ng-click="addPoint()">
+          Add new point
+        </button>
+        <button class="button button-energized button-block" ng-disabled="!isThereEditedNode" ng-click="savePoints()">
+          Save changes
+        </button>
+      </ion-item>
+    </ion-list>
+  </ion-side-menu>
+</ion-side-menus>

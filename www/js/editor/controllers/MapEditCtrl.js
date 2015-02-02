@@ -8,6 +8,28 @@ MapEditCtrl = function($scope, $http, $timeout, MapEditorService, BicycleRouteSe
   editedMarkers = [];
   markers = [];
   polylines = [];
+
+  $scope.init = function() {
+    var routeInfoPromise;
+    
+    routeInfoPromise = LocalDataProviderService.loadRouteInfo();
+
+    routeInfoPromise.then(function(data) {
+      var centerCoordinate;
+      
+      $scope.routeInfo = data;
+      centerCoordinate = BicycleRouteBuilderService.createCoordinate(data[0].lat, data[0].lon);
+      
+      $scope.map = new google.maps.Map(document.querySelector('#container-map-edit').querySelector('#googleMap'), MapBuilderService.createMapProperties(centerCoordinates, 13));
+      
+      polylines.push(BicycleRouteBuilderService.createPolylineFromRoute(data, $scope.map));
+      
+      google.maps.event.addListener($scope.map, 'zoom_changed', function() {
+        $scope.loadRouteInfo();
+      });
+    });
+  }
+
   clearArray = function(array) {
     var obj, _i, _len, _results;
     _results = [];
@@ -54,6 +76,7 @@ MapEditCtrl = function($scope, $http, $timeout, MapEditorService, BicycleRouteSe
   };
   $scope.loadRouteInfo = function() {};
   $scope.isEdit = true;
+
   $scope.initMap = function() {
     var routeInfoPromise;
     window.routeInfo = $scope.routeInfo;
@@ -71,6 +94,7 @@ MapEditCtrl = function($scope, $http, $timeout, MapEditorService, BicycleRouteSe
     });
     return console.log("oke");
   };
+
   $scope.savePoints = function() {
     var addNodes, k, updateNodes, v;
     updateNodes = [];
@@ -84,8 +108,8 @@ MapEditCtrl = function($scope, $http, $timeout, MapEditorService, BicycleRouteSe
         updateNodes.push(v.nodeInfo);
       }
     }
-    BicycleRouteDaoService.savePoints(updateNodes);
-    BicycleRouteDaoService.addPoints(addNodes);
+    BicycleRouteDaoService.updateNodes(updateNodes);
+    BicycleRouteDaoService.addNodes(addNodes);
     return $scope.isThereEditedNode = false;
   };
   $scope.addPoint = function() {
